@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block head %} 
+    <title>Modern Form</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        form {
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        label {
+            display: inline-block;
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="radio"]:checked + label {
+            background-color: #2c3e50;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #27ae60;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218c54;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <form action="#" method="post">
+        <h1>Login</h1>
+        <input type="radio" name="user" id="kunji" value="kunji">
+        <label for="kunji">Kunji</label>
+        <input type="radio" name="user" id="kunja" value="kunja">
+        <label for="kunja">Kunja</label>
+        <input name="password" type="password" placeholder="Password">
+        <button>Submit</button>
+    </form>
+{% endblock %}
