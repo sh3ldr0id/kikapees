@@ -1,41 +1,19 @@
 {% extends 'base.html' %}
 
-{% block head %} 
-    <title>Modern Bucket List</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-
-        h3 {
-            color: #333;
-            background-color: #3498db;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 5px;
-        }
-
-        p {
-            color: #555;
-            background-color: #ecf0f1;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-    </style>
+{% block head %}
+<title>Modern Bucket List</title>
 {% endblock %}
 
 {% block body %}
-    <div>
-        {% for item in bucket %}
-            <h3>{{ item.title }}</h3>
-            <p>{{ item.description }}</p>
-        {% endfor %}
+<div>
+    <a class="link-opacity-100-hover" href="/bucket/create">Create</a>
+    {% for item in bucket %}
+    <div class="card mt-3" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">{{ item.title }}</h5>
+            <p class="card-text">{{ item.description }}</p>
+        </div>
     </div>
+    {% endfor %}
+</div>
 {% endblock %}

@@ -6,8 +6,14 @@
 
 {% block body %}
     <form action="#" method="post">
-        <input name="title" type="text" placeholder="Title">
-        <input name="description" type="text" placeholder="Description">
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1">Title</span>
+            <input type="text" class="form-control" name="title" placeholder="Title" aria-describedby="basic-addon1">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">Description</span>
+            <textarea class="form-control" name="description" placeholder="Description"></textarea>
+        </div>
 
         <button type="submit">Submit</button>
     </form>

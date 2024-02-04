@@ -1,4 +1,4 @@
-from flask import Flask, session, redirect
+from flask import Flask, session, redirect, render_template
 from database.database import init_db
 from firebase_admin import db
 
@@ -22,7 +22,7 @@ def index():
     authorized = db.reference(f"auth/{token}").get()
 
     if authorized:
-        return redirect("/bucket")
+        return render_template("index.html")
     
     else:
         return redirect("/auth/login")

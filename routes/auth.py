@@ -41,7 +41,7 @@ def login():
 
             session["token"] = token
 
-            return redirect("/bucket")
+            return redirect("/")
         
         else: 
             return "Incorrect Password"
