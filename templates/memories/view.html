@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>View - {{ memory.title }}</title>
+{% endblock %}
+
+{% block body %}
+<a class="link-opacity-100-hover" href="/memories/upload/{{ uid }}">Upload</a>
+<h4>{{ memory.description }}</h4>
+<h4>{{ memory.date }}</h4>
+
+<h1>Files</h1>
+
+{% for file in files %}
+<p><a href="{{ file.url }}">{{ file.filename }}</a> - {{ file.uploadedOn }}</p>
+{% endfor %}
+{% endblock %}

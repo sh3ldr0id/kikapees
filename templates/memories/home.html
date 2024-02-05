@@ -6,8 +6,7 @@
 
 {% block body %}
     <div>
-        <a class="link-opacity-100-hover" href="/memories/create">Create</a><br>
-        <a class="link-opacity-100-hover" href="/memories/upload">Upload</a>
+        <a class="link-opacity-100-hover" href="/memories/create">Create</a>
         {% for item in memories %}
             <div class="card mt-3" style="width: 18rem;">
                 <img src="{{ item.pfp }}" class="card-img-top">
@@ -15,7 +14,7 @@
                     <h5 class="card-title">{{ item.title }}</h5>
                     <h6 class="card-subtitle mb-2 text-body-secondary">- {{ item.date }}</h6>
                     <p class="card-text">{{ item.description }}</p>
-                    <a href="#" class="btn btn-primary">View</a>
+                    <a href="/memories/view/{{ item.uid }}" class="btn btn-primary">View</a>
                 </div>
             </div>
         {% endfor %}

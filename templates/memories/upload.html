@@ -7,11 +7,6 @@
 </head>
 <body>
     <form action="#" method="post" enctype="multipart/form-data">
-        <select name="title" id="cars">
-            {% for item in titles %}
-                <option value="{{ item }}">{{ item }}</option>
-            {% endfor %}
-        </select>
         <input type="file" name="file" multiple>
         <button type="submit">submit</button>
     </form>

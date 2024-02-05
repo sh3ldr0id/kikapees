@@ -30,8 +30,10 @@ def home():
         memories.append(
             data[key]
         )
+
+        memories[-1]["uid"] = key
     
-    return render_template("memories/home.html", memories=memories)
+    return render_template("memories/home.html", keys=keys, memories=memories)
     
 @blueprint.route('/create', methods=["GET", "POST"])
 def create():
@@ -71,38 +73,25 @@ def create():
 
         return redirect("/memories")
     
-@blueprint.route('/upload', methods=["GET", "POST"])
-def upload():
+@blueprint.route('/upload/<uid>', methods=["GET", "POST"])
+def upload(uid):
     token = session.get("token")
 
     authorized = db.reference(f"auth/{token}").get()
 
     if not authorized:
         return redirect("/")
+    
+    memory = db.reference(f"memories/{uid}").get()
+
+    if not memory:
+        return redirect("/404")
 
     if request.method == "GET":
-        memories = db.reference("memories").get()
-
-        keys = []
-
-        if memories:
-            keys = memories.keys()
-        
-        titles = []
-
-        for key in keys:
-            titles.append(
-                memories[key]["title"]
-            )
-        
-        return render_template("memories/upload.html", titles=titles)
+        return render_template("memories/upload.html", memory=memory)
     
     elif request.method == "POST":
-        title = request.form["title"]
         files = request.files.getlist("file")
-
-        uid = db.reference("memories").order_by_child("title").equal_to(title).get().keys()
-        uid = list(uid)[0]
 
         for file in files:
 
@@ -111,17 +100,46 @@ def upload():
             filename = file.filename
             extension = filename.rsplit('.', 1)[1]
 
-            while storage.bucket("kikapees.appspot.com").blob(f"memories/{title}/{filename}").exists():
+            while storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/{filename}").exists():
                 suffix += 1
                 filename = f'{filename} ({suffix}).{extension}'
 
-            db.reference(f"memories/{uid}/files").push({
-                "filename": filename,
-                "uploadedOn": datetime.now().timestamp()
-            })
-
-            blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{title}/{filename}")
+            blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory["title"]}/{filename}")
 
             blob.upload_from_file(file)
 
-        return redirect("/memories")
+            blob.make_public()
+
+            url = blob.public_url
+
+            db.reference(f"memories/{uid}/files").push({
+                "filename": filename,
+                "url": url,
+                "uploadedOn": datetime.now().timestamp()
+            })
+
+        return redirect(f"/memories/view/{uid}")
+    
+@blueprint.route("/view/<uid>")
+def view(uid):
+    token = session.get("token")
+
+    authorized = db.reference(f"auth/{token}").get()
+
+    if not authorized:
+        return redirect("/")
+    
+    memory = db.reference(f"memories/{uid}").get()
+
+    if not memory:
+        return redirect("/404")
+    
+    files = []
+    
+    if "files" in memory:
+        files = list(memory["files"].values())
+        
+    for index, file in enumerate(files):
+        files[index]["uploadedOn"] = datetime.fromtimestamp(file["uploadedOn"]) 
+        
+    return render_template("memories/view.html", uid=uid, memory=memory, files=files)
