@@ -134,20 +134,23 @@ def delete(uid):
     if not memory:
         return redirect("/404")
     
-    files = db.reference(f"memories/{uid}/files").get().keys()
+    files = db.reference(f"memories/{uid}/files").get()
 
-    if not files:
-        return redirect("/404")
-    
-    for fileId in files:
-        file = db.reference(f"memories/{uid}/files/{fileId}").get().values()
+    if files:
+        files = files.keys()
+        
+        for fileId in files:
+            file = db.reference(f"memories/{uid}/files/{fileId}").get()
+            print(file)
 
-        blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/{file['filename']}")
-        blob.delete()    
+            blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/{file['filename']}")
+            blob.delete()    
 
-        db.reference(f"memories/{uid}/files").update({fileId: None})
+            db.reference(f"memories/{uid}/files").update({fileId: None})
 
     db.reference(f"memories").update({uid: None})
+
+    return redirect("/memories")
     
 @blueprint.route("/view/<uid>")
 def view(uid):
