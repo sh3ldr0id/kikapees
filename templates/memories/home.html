@@ -1,22 +1,34 @@
 {% extends 'base.html' %}
 
-{% block head %} 
-    <title>Memories</title>
+{% block head %}
+<title>Memories</title>
 {% endblock %}
 
 {% block body %}
-    <div>
-        <a class="link-opacity-100-hover" href="/memories/create">Create</a>
-        {% for item in memories %}
-            <div class="card mt-3" style="width: 18rem;">
-                <img src="{{ item.pfp }}" class="card-img-top">
-                <div class="card-body">
-                    <h5 class="card-title">{{ item.title }}</h5>
-                    <h6 class="card-subtitle mb-2 text-body-secondary">- {{ item.date }}</h6>
-                    <p class="card-text">{{ item.description }}</p>
-                    <a href="/memories/view/{{ item.uid }}" class="btn btn-primary">View</a>
-                </div>
-            </div>
-        {% endfor %}
+<div>
+    <a class="link-opacity-100-hover" href="/memories/create">Create</a>
+    {% for item in memories %}
+    <div class="card mt-3 shadow" style="width: 18rem;">
+        <div class="dropdown m-2" style="position: absolute;">
+            <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue" class="bi bi-three-dots"
+                    viewBox="0 0 16 16" style="rotate: 90deg;">
+                    <path
+                        d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                </svg>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/memories/view/{{ item.uid }}">Open</a></li>
+                <li><a class="dropdown-item" href="/memories/delete/{{ uid }}">Delete</a></li>
+            </ul>
+        </div>
+        <img src="{{ item.pfp }}" height="200px" class="card-img-top object-fit-cover overflow-hidden border-bottom">
+        <div class="card-body">
+            <h5 class="card-title">{{ item.title }}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">- {{ item.date }}</h6>
+            <p class="card-text">{{ item.description }}</p>
+        </div>
     </div>
+    {% endfor %}
+</div>
 {% endblock %}

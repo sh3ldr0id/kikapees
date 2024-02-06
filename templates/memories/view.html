@@ -15,8 +15,8 @@
 <div class="card m-2 shadow" style="width: 18rem;">
     <div class="card-body d-flex">
         <div class="flex-fill">
-            <h6 class="card-text filename">{{ file.filename }}</h6>
-            <p class="card-subtitle mb-2 text-body-secondary">{{ file.uploadedOn }}</p>
+            <h6 class="card-text filename  fs-6">{{ file.filename }}</h6>
+            <p class="card-subtitle text-body-secondary fs-6">{{ file.uploadedOn }}</p>
         </div>
         <div class="dropdown">
             <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -33,9 +33,7 @@
             </ul>
         </div>
     </div>
-    <a href="">
-        <img src="{{ file.url }}" height="200px" class="card-img-bottom object-fit-cover overflow-hidden border-top">
-    </a>
+    <img src="{{ file.url }}" height="200px" class="card-img-bottom object-fit-cover overflow-hidden c">
 </div>
 {% endfor %}
 

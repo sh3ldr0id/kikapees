@@ -120,6 +120,35 @@ def upload(uid):
 
         return redirect(f"/memories/view/{uid}")
     
+@blueprint.route("/delete/<uid>")
+def delete(uid):
+    token = session.get("token")
+
+    authorized = db.reference(f"auth/{token}").get()
+
+    if not authorized:
+        return redirect("/")
+    
+    memory = db.reference(f"memories/{uid}").get()
+
+    if not memory:
+        return redirect("/404")
+    
+    files = db.reference(f"memories/{uid}/files").get().keys()
+
+    if not files:
+        return redirect("/404")
+    
+    for fileId in files:
+        file = db.reference(f"memories/{uid}/files/{fileId}").get().values()
+
+        blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/{file['filename']}")
+        blob.delete()    
+
+        db.reference(f"memories/{uid}/files").update({fileId: None})
+
+    db.reference(f"memories").update({uid: None})
+    
 @blueprint.route("/view/<uid>")
 def view(uid):
     token = session.get("token")
