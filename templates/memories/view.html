@@ -9,9 +9,50 @@
 <h4>{{ memory.description }}</h4>
 <h4>{{ memory.date }}</h4>
 
-<h1>Files</h1>
+<h1 class="mb-5">Files</h1>
 
 {% for file in files %}
-<p><a href="{{ file.url }}">{{ file.filename }}</a> - {{ file.uploadedOn }}</p>
+<div class="card m-2 shadow" style="width: 18rem;">
+    <div class="card-body d-flex">
+        <div class="flex-fill">
+            <h6 class="card-text filename">{{ file.filename }}</h6>
+            <p class="card-subtitle mb-2 text-body-secondary">{{ file.uploadedOn }}</p>
+        </div>
+        <div class="dropdown">
+            <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue"
+                    class="bi bi-three-dots" viewBox="0 0 16 16" style="rotate: 90deg;">
+                    <path
+                        d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                </svg>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/memories/view/{{ uid }}/open/{{ file.uid }}">Open</a></li>
+                <li><a class="dropdown-item" href="{{ file.url }}">Download</a></li>
+                <li><a class="dropdown-item" href="/memories/view/{{ uid }}/delete/{{ file.uid }}">Delete</a></li>
+            </ul>
+        </div>
+    </div>
+    <a href="">
+        <img src="{{ file.url }}" height="200px" class="card-img-bottom object-fit-cover overflow-hidden border-top">
+    </a>
+</div>
 {% endfor %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var maxLength = 25; // Set your desired character limit
+
+        var elements = document.querySelectorAll('.filename');
+
+        elements.forEach(function (element) {
+            var originalText = element.textContent;
+
+            if (originalText.length > maxLength) {
+                var truncatedText = originalText.substring(0, maxLength) + '...';
+                element.textContent = truncatedText;
+            }
+        });
+    });
+</script>
 {% endblock %}

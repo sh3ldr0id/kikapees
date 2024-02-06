@@ -104,7 +104,7 @@ def upload(uid):
                 suffix += 1
                 filename = f'{filename} ({suffix}).{extension}'
 
-            blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory["title"]}/{filename}")
+            blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/{filename}")
 
             blob.upload_from_file(file)
 
@@ -115,7 +115,7 @@ def upload(uid):
             db.reference(f"memories/{uid}/files").push({
                 "filename": filename,
                 "url": url,
-                "uploadedOn": datetime.now().timestamp()
+                "uploadedOn": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             })
 
         return redirect(f"/memories/view/{uid}")
@@ -137,9 +137,57 @@ def view(uid):
     files = []
     
     if "files" in memory:
+        for key in memory["files"].keys():
+            memory["files"][key]["uid"] = key
+            
+            files = memory["files"]
         files = list(memory["files"].values())
         
-    for index, file in enumerate(files):
-        files[index]["uploadedOn"] = datetime.fromtimestamp(file["uploadedOn"]) 
-        
     return render_template("memories/view.html", uid=uid, memory=memory, files=files)
+
+@blueprint.route("/view/<uid>/delete/<fileId>")
+def delete_file(uid, fileId):
+    token = session.get("token")
+
+    authorized = db.reference(f"auth/{token}").get()
+
+    if not authorized:
+        return redirect("/")
+    
+    memory = db.reference(f"memories/{uid}").get()
+
+    if not memory:
+        return redirect("/404")
+    
+    file = db.reference(f"memories/{uid}/files/{fileId}").get()
+
+    if not file:
+        return redirect("/404")
+    
+    blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/{file['filename']}")
+    blob.delete()
+
+    db.reference(f"memories/{uid}/files").update({fileId: None})
+    
+    return redirect(f"/memories/view/{uid}")
+
+@blueprint.route("/view/<uid>/open/<fileId>")
+def open(uid, fileId):
+    token = session.get("token")
+
+    authorized = db.reference(f"auth/{token}").get()
+
+    if not authorized:
+        return redirect("/")
+    
+    memory = db.reference(f"memories/{uid}").get()
+
+    if not memory:
+        return redirect("/404")
+    
+    file = db.reference(f"memories/{uid}/files/{fileId}").get()
+
+    if not file:
+        return redirect("/404")
+    
+    return f"<img src='{file['url']}'>"
