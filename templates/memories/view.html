@@ -2,14 +2,20 @@
 
 {% block head %}
 <title>View - {{ memory.title }}</title>
+<link rel="icon" href="{{ memory.pfp }}" type="image/x-icon">
 {% endblock %}
 
 {% block body %}
-<a class="link-opacity-100-hover" href="/memories/upload/{{ uid }}">Upload</a>
-<h4>{{ memory.description }}</h4>
-<h4>{{ memory.date }}</h4>
+<div class="card m-2" style="width: 75%;">
+    <div class="card-body">
+        <h5 class="card-title">{{ memory.title }}</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">{{ memory.date }}</h6>
+        <p class="card-text fw-light fst-italic">"{{ memory.description }}"</p>
+        <a href="/memories/upload/{{ uid }}" class="card-link">Upload New</a>
+    </div>
+</div>
 
-<h1 class="mb-5">Files</h1>
+<hr style="color: black;">
 
 {% for file in files %}
 <div class="card m-2 shadow" style="width: 18rem;">
@@ -20,8 +26,8 @@
         </div>
         <div class="dropdown">
             <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue"
-                    class="bi bi-three-dots" viewBox="0 0 16 16" style="rotate: 90deg;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue" class="bi bi-three-dots"
+                    viewBox="0 0 16 16" style="rotate: 90deg;">
                     <path
                         d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
                 </svg>
@@ -29,7 +35,8 @@
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="/memories/view/{{ uid }}/open/{{ file.uid }}">Open</a></li>
                 <li><a class="dropdown-item" href="{{ file.url }}">Download</a></li>
-                <li><a class="dropdown-item" href="/memories/view/{{ uid }}/delete/{{ file.uid }}">Delete</a></li>
+                <li><a class="dropdown-item text-danger"
+                        href="/memories/view/{{ uid }}/delete/{{ file.uid }}">Delete</a></li>
             </ul>
         </div>
     </div>

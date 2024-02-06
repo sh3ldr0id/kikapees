@@ -1,16 +1,27 @@
 {% extends 'base.html' %}
 
-{% block head %} 
-    <title>Create a To Do</title>
+{% block head %}
+<title>Create a To Do</title>
 {% endblock %}
 
 {% block body %}
-    <form action="#" method="post" enctype="multipart/form-data">
-        <input type="file" name="pfp" accept=".png, .jpg, .jpeg, .gif">
-        <input name="title" type="text" placeholder="Title">
-        <input name="description" type="text" placeholder="Description">
-        <input type="date" name="date">
-
-        <button type="submit">Submit</button>
-    </form>
+<form action="#" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="titleInput" class="form-label">Title</label>
+        <input type="text" name="title" class="form-control" id="titleInput" placeholder="Title">
+    </div>
+    <div class="mb-3">
+        <label for="descriptionInput" class="form-label">Description</label>
+        <textarea class="form-control" id="descriptioInput" rows="3" placeholder="Description" name="description"></textarea>
+    </div>
+    <div class="mb-3">
+        <label for="dateInput" class="form-label">Date</label>
+        <input class="form-control" type="date" id="dateInput" name="date">
+    </div>
+    <div class="mb-3">
+        <label for="fileInput" class="form-label">Thumbnail</label>
+        <input class="form-control" type="file" id="fileInput" accept=".png, .jpg, .jpeg, .gif" name="pfp">
+    </div>
+    <button class="shadow-sm rounded btn btn-success px-5" type="submit" style="width: 100%;">Submit</button>
+</form>
 {% endblock %}

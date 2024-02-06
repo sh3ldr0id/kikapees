@@ -1,14 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <form action="#" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" multiple>
-        <button type="submit">submit</button>
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Upload File(s)</title>
+<style>
+    body {
+        height: 100vh;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<form action="#" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="fileInput" class="form-label">Files</label>
+        <input class="form-control" type="file" id="fileInput" accept=".png, .jpg, .jpeg, .gif" name="files" multiple>
+    </div>
+    <button class="shadow-sm rounded btn btn-success px-5" type="submit" style="width: 100%;">Submit</button>
+</form>
+{% endblock %}

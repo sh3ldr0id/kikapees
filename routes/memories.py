@@ -17,7 +17,7 @@ def home():
     if not authorized:
         return redirect("/")
     
-    data = db.reference("memories").get()
+    data = db.reference("memories").order_by_child("date").get()
     
     keys = []
 
@@ -32,6 +32,8 @@ def home():
         )
 
         memories[-1]["uid"] = key
+
+    memories.reverse()
     
     return render_template("memories/home.html", keys=keys, memories=memories)
     
@@ -91,10 +93,9 @@ def upload(uid):
         return render_template("memories/upload.html", memory=memory)
     
     elif request.method == "POST":
-        files = request.files.getlist("file")
+        files = request.files.getlist("files")
 
         for file in files:
-
             suffix = 1
 
             filename = file.filename
