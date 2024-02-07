@@ -57,12 +57,31 @@
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="/memories/view/{{ uid }}/open/{{ file.uid }}">Open</a></li>
                     <li><a class="dropdown-item" href="{{ file.url }}">Download</a></li>
-                    <li><a class="dropdown-item text-danger"
-                            href="/memories/view/{{ uid }}/delete/{{ file.uid }}">Delete</a></li>
+                    <li><a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</a></li>
                 </ul>
             </div>
         </div>
         <img src="{{ file.url }}" height="200px" class="card-img-bottom object-fit-cover overflow-hidden c">
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteModalLabel">Actions have consequences...</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure that you want to delete "{{ file.filename }}"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="/memories/view/{{ uid }}/delete/{{ file.uid }}">
+                        <button type="button" class="btn btn-danger">Delete</button>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
     {% endfor %}
 </div>

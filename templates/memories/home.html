@@ -5,20 +5,25 @@
 <style>
     .g-container {
         display: grid;
-        grid-template-columns: repeat(3, 1fr); /* Three columns with equal width */
+        grid-template-columns: repeat(3, 1fr);
+        /* Three columns with equal width */
     }
 
     @media (max-width: 950px) {
+
         /* Adjust layout for smaller screens */
         .g-container {
-            grid-template-columns: repeat(2, 1fr); /* Single column on smaller screens */
+            grid-template-columns: repeat(2, 1fr);
+            /* Single column on smaller screens */
         }
     }
 
     @media (max-width: 650px) {
+
         /* Adjust layout for smaller screens */
         .g-container {
-            grid-template-columns:  repeat(1, 1fr); /* Single column on smaller screens */
+            grid-template-columns: repeat(1, 1fr);
+            /* Single column on smaller screens */
         }
     }
 </style>
@@ -29,31 +34,51 @@
 
 <div class="g-container">
     {% for item in memories %}
-        <div class="card m-3 shadow" style="width: 18rem;">
-            <img src="{{ item.pfp }}" height="200px" class="card-img-top object-fit-cover overflow-hidden border-bottom">
-            <div class="card-body">
-                <div class="d-flex">
-                    <div class="flex-fill">
-                        <h5 class="card-title">{{ item.title }}</h5>
-                        <h6 class="card-subtitle mb-2 text-body-secondary">- {{ item.date }}</h6>
-                    </div>
-                    <div class="dropdown m-2">
-                        <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue"
-                                class="bi bi-three-dots" viewBox="0 0 16 16" style="rotate: 90deg;">
-                                <path
-                                    d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                            </svg>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/memories/view/{{ item.uid }}">Open</a></li>
-                            <li><a class="dropdown-item text-danger" href="/memories/delete/{{ item.uid }}">Delete</a></li>
-                        </ul>
-                    </div>
+    <div class="card m-3 shadow" style="width: 18rem;">
+        <img src="{{ item.pfp }}" height="200px" class="card-img-top object-fit-cover overflow-hidden border-bottom">
+        <div class="card-body">
+            <div class="d-flex">
+                <div class="flex-fill">
+                    <h5 class="card-title">{{ item.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">- {{ item.date }}</h6>
                 </div>
-                <p class="card-text fw-light fst-italic description">"{{ item.description }}"</p>
+                <div class="dropdown m-2">
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue"
+                            class="bi bi-three-dots" viewBox="0 0 16 16" style="rotate: 90deg;">
+                            <path
+                                d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/memories/view/{{ item.uid }}">Open</a></li>
+                        <li><a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="card-text fw-light fst-italic description">"{{ item.description }}"</p>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteModalLabel">Actions have consequences...</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure that you want to delete "{{ item.title }}"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="/memories/delete/{{ item.uid }}">
+                        <button type="button" class="btn btn-danger">Delete</button>
+                    </a>
+                </div>
             </div>
         </div>
+    </div>
     {% endfor %}
 </div>
 <script>
