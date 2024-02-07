@@ -11,9 +11,13 @@ app.secret_key = 'SECRET_KEY'
 
 init_db()
 
-@app.route("/404")
-def error():
-    return "Not Found"
+@app.errorhandler(404)
+def not_found(e):
+    return "Invalid/Broken URL"
+
+@app.errorhandler(500)
+def not_found(e):
+    return "Sorryyyy!!! I fucked up somewhere..."
 
 @app.route("/")
 def index():
