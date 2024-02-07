@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>{{ date }}</title>
+{% endblock %}
+
+{% block body %}
+<form action="#" method="post">
+    <label for="day" class="form-label">How was your day?</label>
+    <select class="form-select" id="day" name="day">
+        <option value="good" selected>Good</option>
+        <option value="average">Average</option>
+        <option value="bad">Bad</option>
+    </select>
+    <div class="mb-3">
+        <label for="content" class="form-label">Content</label>
+        <textarea class="form-control" id="content" rows="3" name="content">{{ page.content }}</textarea>
+    </div>
+    <button type="submit">Write</button>
+</form>
+{% endblock %}
