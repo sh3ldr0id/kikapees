@@ -44,7 +44,9 @@ def view(uid):
     if not fish:
         return redirect("/404")
     
-    return render_template("bucket/view.html", uid=uid, fish=fish)
+    fish["uid"] = uid
+    
+    return render_template("bucket/view.html", fish=fish)
 
 @blueprint.route('/create', methods=["GET", "POST"])
 def create():
