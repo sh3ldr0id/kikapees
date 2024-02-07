@@ -52,7 +52,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="/memories/view/{{ item.uid }}">Open</a></li>
-                        <li><a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</a></li>
+                        <li><a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ item.uid }}">Delete</a></li>
                     </ul>
                 </div>
             </div>
@@ -60,11 +60,11 @@
         </div>
     </div>
 
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteModal{{ item.uid }}" tabindex="-1" aria-labelledby="deleteModal{{ item.uid }}Label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="deleteModalLabel">Actions have consequences...</h1>
+                    <h1 class="modal-title fs-5" id="deleteModal{{ item.uid }}Label">Actions have consequences...</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
