@@ -2,34 +2,16 @@
 
 {% block head %}
 <title>Memories</title>
-<style>
-    .g-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        /* Three columns with equal width */
-    }
-
-    @media (max-width: 950px) {
-
-        /* Adjust layout for smaller screens */
-        .g-container {
-            grid-template-columns: repeat(2, 1fr);
-            /* Single column on smaller screens */
-        }
-    }
-
-    @media (max-width: 650px) {
-
-        /* Adjust layout for smaller screens */
-        .g-container {
-            grid-template-columns: repeat(1, 1fr);
-            /* Single column on smaller screens */
-        }
-    }
-</style>
 {% endblock %}
 
 {% block body %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Memories</li>
+    </ol>
+</nav>
+
 <a class="btn btn-success m-4" href="/memories/create" style="width: 18rem;">Create New</a>
 
 <div class="g-container">
@@ -52,7 +34,9 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="/memories/view/{{ item.uid }}">Open</a></li>
-                        <li><a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ item.uid }}">Delete</a></li>
+                        <li><a class="dropdown-item" href="/memories/upload/{{ item.uid }}">Upload</a></li>
+                        <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal{{ item.uid }}">Delete</a></li>
                     </ul>
                 </div>
             </div>
@@ -60,7 +44,8 @@
         </div>
     </div>
 
-    <div class="modal fade" id="deleteModal{{ item.uid }}" tabindex="-1" aria-labelledby="deleteModal{{ item.uid }}Label" aria-hidden="true">
+    <div class="modal fade" id="deleteModal{{ item.uid }}" tabindex="-1"
+        aria-labelledby="deleteModal{{ item.uid }}Label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

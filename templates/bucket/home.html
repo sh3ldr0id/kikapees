@@ -1,19 +1,85 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>Modern Bucket List</title>
+<title>Bucket List</title>
 {% endblock %}
 
 {% block body %}
-<div>
-    <a class="link-opacity-100-hover" href="/bucket/create">Create</a>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Bucket</li>
+    </ol>
+</nav>
+
+<a class="btn btn-success m-3 px-4" href="/bucket/create">Create</a>
+
+<div class="g-container">
     {% for item in bucket %}
-    <div class="card mt-3" style="width: 18rem;">
+    <div class="card m-3 shadow" style="width: 18rem;">
         <div class="card-body">
-            <h5 class="card-title">{{ item.title }}</h5>
-            <p class="card-text">{{ item.description }}</p>
+            <div class="d-flex">
+                <div class="flex-fill">
+                    <h5 class="card-title">{{ item.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">- {{ item.date }}</h6>
+                </div>
+                <div class="dropdown">
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue"
+                            class="bi bi-three-dots" viewBox="0 0 16 16" style="rotate: 90deg;">
+                            <path
+                                d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/bucket/view/{{ item.uid }}">Open</a></li>
+                        <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal{{ item.uid }}">Delete</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <p class="card-text fw-light fst-italic description">"{{ item.description }}"</p>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal{{ item.uid }}" tabindex="-1"
+        aria-labelledby="deleteModal{{ item.uid }}Label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteModal{{ item.uid }}Label">Actions have consequences...</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure that you want to delete "{{ item.title }}"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="/bucket/delete/{{ item.uid }}">
+                        <button type="button" class="btn btn-danger">Delete</button>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
     {% endfor %}
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var maxLength = 100; // Set your desired character limit
+
+        var elements = document.querySelectorAll('.description');
+
+        elements.forEach(function (element) {
+            var originalText = element.textContent;
+
+            if (originalText.length > maxLength) {
+                var truncatedText = originalText.substring(0, maxLength) + '..."';
+                element.textContent = truncatedText;
+            }
+        });
+    });
+</script>
 {% endblock %}

@@ -16,23 +16,36 @@ def home():
     if not authorized:
         return redirect("/")
     
-    keys = db.reference("bucket").get()
-
-    if keys:
-        keys = keys.keys()
-
-    else:
-        keys = []
+    data = db.reference("bucket").get()
 
     bucket = []
 
-    for key in keys:
-        bucket.append(
-            db.reference(f"bucket/{key}").get()
-        )
-    
+    if data:
+        for key in data.keys():
+            bucket.append(
+                data[key]
+            )
+
+            bucket[-1]["uid"] = key
+
     return render_template("bucket/home.html", bucket=bucket)
     
+@blueprint.route('/view/<uid>', methods=["GET", "POST"])
+def view(uid):
+    token = session.get("token")
+
+    authorized = db.reference(f"auth/{token}").get()
+
+    if not authorized:
+        return redirect("/")
+    
+    fish = db.reference(f"bucket/{uid}").get()
+
+    if not fish:
+        return redirect("/404")
+    
+    return render_template("bucket/view.html", uid=uid, fish=fish)
+
 @blueprint.route('/create', methods=["GET", "POST"])
 def create():
     token = session.get("token")
@@ -56,8 +69,26 @@ def create():
         bucket.push({
             "title": title,
             "description": description,
-            "created": str(datetime.now()),
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "by": by
         })
 
         return redirect("/bucket")
+    
+@blueprint.route('/delete/<uid>', methods=["GET", "POST"])
+def delete(uid):
+    token = session.get("token")
+
+    authorized = db.reference(f"auth/{token}").get()
+
+    if not authorized:
+        return redirect("/")
+    
+    fish = db.reference(f"bucket/{uid}")
+
+    if not fish.get():
+        return redirect("/404")
+    
+    fish.set({})
+
+    return redirect("/bucket")

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>Upload File(s)</title>
+<title>Upload File(s) - {{ memory.title }}</title>
 <style>
     body {
         height: 100vh;
@@ -10,6 +10,15 @@
 {% endblock %}
 
 {% block body %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/memories">Memories</a></li>
+        <li class="breadcrumb-item"><a href="/memories/view/{{ memory.uid }}">View</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Upload</li>
+    </ol>
+</nav>
+
 <form action="#" method="post" enctype="multipart/form-data">
     <div class="mb-3">
         <label for="fileInput" class="form-label">Files</label>

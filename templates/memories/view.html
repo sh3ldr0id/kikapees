@@ -3,33 +3,21 @@
 {% block head %}
 <title>View - {{ memory.title }}</title>
 <link rel="icon" href="{{ memory.pfp }}" type="image/x-icon">
-<style>
-    .g-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr); /* Three columns with equal width */
-    }
-
-    @media (max-width: 950px) {
-        /* Adjust layout for smaller screens */
-        .g-container {
-            grid-template-columns: repeat(2, 1fr); /* Single column on smaller screens */
-        }
-    }
-
-    @media (max-width: 650px) {
-        /* Adjust layout for smaller screens */
-        .g-container {
-            grid-template-columns:  repeat(1, 1fr); /* Single column on smaller screens */
-        }
-    }
-</style>
 {% endblock %}
 
 {% block body %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/memories">Memories</a></li>
+        <li class="breadcrumb-item active" aria-current="page">View</li>
+    </ol>
+</nav>
+
 <div class="card m-2" style="width: 75%;">
     <div class="card-body">
         <h5 class="card-title">{{ memory.title }}</h5>
-        <h6 class="card-subtitle mb-2 text-body-secondary">{{ memory.date }}</h6>
+        <h6 class="card-subtitle mb-2 text-body-secondary">-{{ memory.date }}</h6>
         <p class="card-text fw-light fst-italic">"{{ memory.description }}"</p>
         <a href="/memories/upload/{{ uid }}" class="card-link">Upload New</a>
     </div>

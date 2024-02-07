@@ -88,6 +88,8 @@ def upload(uid):
 
     if not memory:
         return redirect("/404")
+    
+    memory["uid"] = uid
 
     if request.method == "GET":
         return render_template("memories/upload.html", memory=memory)

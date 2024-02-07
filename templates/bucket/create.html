@@ -1,20 +1,54 @@
 {% extends 'base.html' %}
 
-{% block head %} 
-    <title>Create a To Do</title>
+{% block head %}
+<title>Create a To Do</title>
+<style>
+    body {
+        height: 100vh;
+        align-items: center;
+    }
+
+    .cont {
+        width: 60%;
+    }
+
+    @media (max-width: 800px) {
+        .cont {
+            width: 75%;
+        }
+    }
+
+    @media (max-width: 500px) {
+        .cont {
+            width: 90%;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block body %}
-    <form action="#" method="post">
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="basic-addon1">Title</span>
-            <input type="text" class="form-control" name="title" placeholder="Title" aria-describedby="basic-addon1">
-        </div>
-        <div class="input-group">
-            <span class="input-group-text">Description</span>
-            <textarea class="form-control" name="description" placeholder="Description"></textarea>
-        </div>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/bucket">Bucket</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Create</li>
+    </ol>
+</nav>
 
-        <button type="submit">Submit</button>
+<div class="d-flex justify-content-center align-items-center flex-column border rounded shadow cont">
+    <h2 class="my-3">Add a Fish</h2>
+    <form action="#" method="post" class="d-flex justify-content-center flex-column"
+        style="width: 75%;">
+    
+        <div class="mb-3">
+            <label for="titleInput" class="form-label">Title</label>
+            <input name="title" type="text" class="form-control" id="titleInput" placeholder="Name the fish">
+        </div>
+        <div class="mb-3">
+            <label for="descriptionInput" class="form-label">Description</label>
+            <textarea name="description" class="form-control" id="descriptionInput" rows="3" placeholder="Feed the fish"></textarea>
+        </div>
+        <button class="shadow-sm rounded btn btn-success  mt-3 mb-4" type="submit">Submit</button>
     </form>
+</div>
 {% endblock %}
