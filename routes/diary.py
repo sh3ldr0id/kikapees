@@ -7,6 +7,26 @@ blueprint = Blueprint(
     __name__
 )
 
+def other(user):
+    if user == "kunji":
+        other = "kunja"
+
+    else:
+        other = "kunji"
+
+    return other
+
+@blueprint.route('/')
+def home():
+    token = session.get("token")
+
+    authorized = db.reference(f"auth/{token}").get()
+
+    if not authorized:
+        return redirect("/")
+    
+    return redirect(f"/diary/view/{datetime.now().strftime('%Y-%m-%d')}/{other(authorized['user'])}")
+
 @blueprint.route('/view/<custom_date:date>/<user>')
 def view(date, user):
     if not date:
@@ -43,7 +63,7 @@ def write(date):
     if request.method == "GET":
         page = db.reference(f"diary/{date}/{user}").get()
 
-        return render_template("diary/write.html", page=page)
+        return render_template("diary/write.html", date=date.strftime('%A, %d %B %Y'), page=page)
     
     elif request.method == "POST":
         content = request.form["content"]

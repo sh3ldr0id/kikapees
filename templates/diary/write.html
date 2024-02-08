@@ -13,12 +13,36 @@
         resize: none;
         overflow-y: hidden;
     }
+
+    .page {
+        width: 75%;
+    }
+    textarea {
+        font-size: 40px;
+    }
+
+    @media (max-width: 950px) {
+        .page {
+            width: 80%
+        }
+        textarea {
+            font-size: smaller;
+        }
+    }
+
+    @media (max-width: 650px) {
+        .page {
+            width: 95%;
+        }
+        textarea {
+            font-size: smaller;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="my-5 d-flex justify-content-center align-items-center" style="width: 75%;">
-    <form action="#" method="post" class="card rounded shadow" style="width: 75%;">
+    <form action="#" method="post" class="card rounded shadow page my-5">
         <div class="card-header">
             <h4 class="fw-light fst-italic">
                 {{ date }}
@@ -31,10 +55,9 @@
                     {{ page }}
                 </textarea>
             </blockquote>
-            <button type="submit">Write</button>
+            <button class="btn btn-success my-2 py-1 px-3" type="submit">Write</button>
         </div>
     </form>
-</div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

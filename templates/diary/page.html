@@ -2,11 +2,37 @@
 
 {% block head %}
 <title>{{ date }}</title>
+<style>
+    .page {
+        width: 75%;
+    }
+    p {
+        font-size: large;
+    }
+
+    @media (max-width: 950px) {
+        .page {
+            width: 80%
+        }
+        p {
+            font-size: smaller;
+        }
+    }
+
+    @media (max-width: 650px) {
+        .page {
+            width: 95%;
+        }
+        p {
+            font-size: smaller;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block body %}
-<div class="my-5 d-flex justify-content-center align-items-center" style="width: 75%;">
-    <div class="card rounded shadow" style="width: 75%;">
+<!-- <div class=" d-flex justify-content-center align-items-center page"> -->
+    <div class="card rounded shadow my-5 page">
         <div class="card-header">
             <h4 class="fw-light fst-italic">
                 {{ date }}
@@ -19,5 +45,5 @@
             </blockquote>
         </div>
     </div>
-</div>
+<!-- </div> -->
 {% endblock %}
