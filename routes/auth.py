@@ -32,12 +32,13 @@ def login():
         if auth[user] == password:
             token = str(uuid4())
 
-            ref = db.reference('auth')
+            db.reference('auth').update({token: user})
 
-            ref.update({token: {
-                "time": datetime.now().timestamp(),
-                "user": user
-            }})
+            db.reference(f"users/{user}/sessions/{token}").update({
+                "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "active": True,
+                "ip": request.remote_addr
+            })
 
             session["token"] = token
 
@@ -48,10 +49,33 @@ def login():
         
 @blueprint.route('/logout')
 def logout():
-    ref = db.reference('auth')
+    token = session.get("token")
 
-    ref.update({session["token"]: None})
+    authorized = db.reference(f'auth/{token}').get()
+
+    if authorized:
+        db.reference('auth').update({
+            token: None
+        })
+
+    db.reference(f'users/{authorized}/sessions/{token}').update({"active": False})
 
     session["token"] = None
 
     return redirect("/")
+
+@blueprint.route("/sessions")
+def sessions():
+    token = session.get("token")
+
+    authorized = db.reference(f"auth/{token}").get()
+
+    if not authorized:
+        return redirect("/")
+    
+    sessions = db.reference(f"users/{authorized}/sessions").get()
+
+    if sessions:
+        sessions = sessions.values()
+
+    return render_template("auth/sessions.html", sessions=sessions)
