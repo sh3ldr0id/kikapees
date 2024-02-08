@@ -71,7 +71,7 @@ def create():
         bucket.push({
             "title": title,
             "description": description,
-            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
             "by": by
         })
 
