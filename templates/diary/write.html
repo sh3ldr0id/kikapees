@@ -3,12 +3,10 @@
 {% block head %}
 <title>{{ date }}</title>
 <style>
-    /* Set a minimum height for the textarea */
     textarea {
-        min-height: 50px; /* Adjust as needed */
+        min-height: 50px;
     }
 
-    /* Allow the textarea to grow dynamically */
     textarea.expanding {
         resize: none;
         overflow-y: hidden;
@@ -17,16 +15,10 @@
     .page {
         width: 75%;
     }
-    textarea {
-        font-size: 40px;
-    }
 
     @media (max-width: 950px) {
         .page {
             width: 80%
-        }
-        textarea {
-            font-size: smaller;
         }
     }
 
@@ -34,35 +26,40 @@
         .page {
             width: 95%;
         }
-        textarea {
-            font-size: smaller;
-        }
     }
 </style>
 {% endblock %}
 
 {% block body %}
-    <form action="#" method="post" class="card rounded shadow page my-5">
-        <div class="card-header">
-            <h4 class="fw-light fst-italic">
-                {{ date }}
-            </h4>
-        </div>
-        <div class="card-body">
-            <blockquote class="blockquote mb-0">
-                <h5>Dear Diary,</h5>
-                <textarea class="form-control expanding" id="content" name="content" rows="4" oninput="autoExpand(this)">
+<nav aria-label="breadcrumb" class="mt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/diary">Diary</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Write</li>
+    </ol>
+</nav>
+
+<form action="#" method="post" class="card rounded shadow page my-3">
+    <div class="card-header">
+        <h4 class="fw-light fst-italic">
+            {{ date }}
+        </h4>
+    </div>
+    <div class="card-body">
+        <blockquote class="blockquote mb-0">
+            <h5>Dear {{ other }},</h5>
+            <textarea class="form-control expanding" id="content" name="content" rows="4" oninput="autoExpand(this)">
                     {{ page }}
                 </textarea>
-            </blockquote>
-            <button class="btn btn-success my-2 py-1 px-3" type="submit">Write</button>
-        </div>
-    </form>
+        </blockquote>
+        <button class="btn btn-success my-2 py-1 px-3" type="submit">Write</button>
+    </div>
+</form>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Call autoExpand on DOMContentLoaded to handle initial content
-        document.querySelectorAll('.expanding').forEach(function(textarea) {
+        document.querySelectorAll('.expanding').forEach(function (textarea) {
             autoExpand(textarea);
         });
     });

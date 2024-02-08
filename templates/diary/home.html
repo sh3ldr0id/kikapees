@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Diary</title>
+{% endblock %}
+
+{% block body %}
+<a href="/diary/view/{{ date }}/{{ other }}">View</a>
+<a href="/diary/write/{{ date }}">Write</a>
+{% endblock %}
