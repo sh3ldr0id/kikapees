@@ -2,20 +2,54 @@
 
 {% block head %}
 <title>{{ date }}</title>
+<style>
+    /* Set a minimum height for the textarea */
+    textarea {
+        min-height: 50px; /* Adjust as needed */
+    }
+
+    /* Allow the textarea to grow dynamically */
+    textarea.expanding {
+        resize: none;
+        overflow-y: hidden;
+    }
+</style>
 {% endblock %}
 
 {% block body %}
-<form action="#" method="post">
-    <label for="day" class="form-label">How was your day?</label>
-    <select class="form-select" id="day" name="day">
-        <option value="good" selected>Good</option>
-        <option value="average">Average</option>
-        <option value="bad">Bad</option>
-    </select>
-    <div class="mb-3">
-        <label for="content" class="form-label">Content</label>
-        <textarea class="form-control" id="content" rows="3" name="content">{{ page.content }}</textarea>
-    </div>
-    <button type="submit">Write</button>
-</form>
+<div class="my-5 d-flex justify-content-center align-items-center" style="width: 75%;">
+    <form action="#" method="post" class="card rounded shadow" style="width: 75%;">
+        <div class="card-header">
+            <h4 class="fw-light fst-italic">
+                {{ date }}
+            </h4>
+        </div>
+        <div class="card-body">
+            <blockquote class="blockquote mb-0">
+                <h5>Dear Diary,</h5>
+                <textarea class="form-control expanding" id="content" name="content" rows="4" oninput="autoExpand(this)">
+                    {{ page }}
+                </textarea>
+            </blockquote>
+            <button type="submit">Write</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Call autoExpand on DOMContentLoaded to handle initial content
+        document.querySelectorAll('.expanding').forEach(function(textarea) {
+            autoExpand(textarea);
+        });
+    });
+
+    function autoExpand(textarea) {
+        // Reset the height to the default to get the scroll height
+        textarea.style.height = 'inherit';
+
+        // Set the height based on the scroll height of the content
+        textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+</script>
 {% endblock %}

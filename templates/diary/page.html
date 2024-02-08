@@ -5,14 +5,19 @@
 {% endblock %}
 
 {% block body %}
-<div class="card">
-    <div class="card-header">
-        {{ page.day }}
-    </div>
-    <div class="card-body">
-        <blockquote class="blockquote mb-0">
-            <p>{{ page.content }}</p>
-        </blockquote>
+<div class="my-5 d-flex justify-content-center align-items-center" style="width: 75%;">
+    <div class="card rounded shadow" style="width: 75%;">
+        <div class="card-header">
+            <h4 class="fw-light fst-italic">
+                {{ date }}
+            </h4>
+        </div>
+        <div class="card-body">
+            <blockquote class="blockquote mb-0">
+                <h5>Dear {{ other }},</h5>
+                <p style="white-space: pre-wrap;">{{ page }}</p>
+            </blockquote>
+        </div>
     </div>
 </div>
 {% endblock %}
