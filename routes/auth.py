@@ -12,13 +12,17 @@ blueprint = Blueprint(
 )
 
 def get_location(ip_address):
-    response = requests.get(f'https://api.iplocation.net/?cmd=ip-country&ip={ip_address}').json()
-    print(response)
-    location_data = {
-        "city": response.get("city"),
-        "region": response.get("region"),
-        "country": response.get("country_name")
-    }
+    try:
+        response = requests.get(f'https://api.iplocation.net/?cmd=ip-country&ip={ip_address}').json()
+
+        location_data = {
+            "city": response.get("city"),
+            "region": response.get("region"),
+            "country": response.get("country_name")
+        }
+    except:
+        location_data = {}
+
     return location_data
     
 @blueprint.route('/login', methods=["GET", "POST"])
