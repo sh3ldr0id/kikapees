@@ -4,11 +4,22 @@ from datetime import datetime
 from json import loads
 from uuid import uuid4
 from os import path, getcwd
+import requests
 
 blueprint = Blueprint(
     'auth', 
     __name__
 )
+
+def get_location(ip_address):
+    response = requests.get(f'https://api.iplocation.net/?cmd=ip-country&ip={ip_address}').json()
+    print(response)
+    location_data = {
+        "city": response.get("city"),
+        "region": response.get("region"),
+        "country": response.get("country_name")
+    }
+    return location_data
     
 @blueprint.route('/login', methods=["GET", "POST"])
 def login():
@@ -34,10 +45,15 @@ def login():
 
             db.reference('auth').update({token: user})
 
+            location = get_location(request.remote_addr)
+
+            print(location)
+
             db.reference(f"users/{user}/sessions/{token}").update({
                 "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "active": True,
-                "ip": request.remote_addr
+                "ip": request.remote_addr,
+                "location": location
             })
 
             session["token"] = token
@@ -64,6 +80,36 @@ def logout():
 
     return redirect("/")
 
+@blueprint.route('/deactivate/<tok>')
+def deactivate(tok):
+    token = session.get("token")
+
+    authorized = db.reference(f'auth/{token}').get()
+
+    if authorized:
+        db.reference('auth').update({
+            tok: None
+        })
+
+    db.reference(f'users/{authorized}/sessions/{tok}').update({"active": False})
+
+    return redirect("/auth/sessions")
+
+@blueprint.route('/delete/<tok>')
+def delete(tok):
+    token = session.get("token")
+
+    authorized = db.reference(f'auth/{token}').get()
+
+    if authorized:
+        db.reference('auth').update({
+            tok: None
+        })
+
+    db.reference(f'users/{authorized}/sessions').update({tok: None})
+
+    return redirect("/auth/sessions")
+
 @blueprint.route("/sessions")
 def sessions():
     token = session.get("token")
@@ -73,9 +119,16 @@ def sessions():
     if not authorized:
         return redirect("/")
     
-    sessions = db.reference(f"users/{authorized}/sessions").get()
+    sessions = db.reference(f"users/{authorized}/sessions").order_by_child("time").get()
 
     if sessions:
-        sessions = sessions.values()
+        tokens = list(sessions.keys())
+        sessions = list(sessions.values())
+
+        for index in range(len(sessions)):
+            sessions[index]["active"] = "Active" if sessions[index]["active"] else "Inactive"
+            sessions[index]["token"] = tokens[index]
+
+    sessions.reverse()
 
     return render_template("auth/sessions.html", sessions=sessions)

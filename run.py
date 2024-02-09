@@ -1,4 +1,5 @@
 from flask import Flask, session, redirect, render_template
+from werkzeug.middleware.proxy_fix import ProxyFix
 from database.database import init_db
 from firebase_admin import db
 
@@ -25,6 +26,8 @@ app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
 
 app.url_map.converters['custom_date'] = CustomDateConverter
+
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
 
 init_db()
 
