@@ -7,6 +7,7 @@ from routes.auth import blueprint as auth_blueprint
 from routes.bucket import blueprint as bucket_blueprint
 from routes.memories import blueprint as memories_blueprint
 from routes.diary import blueprint as diary_blueprint
+from routes.chat import blueprint as chat_blueprint
 
 from werkzeug.routing import BaseConverter
 from datetime import datetime
@@ -31,9 +32,9 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
 
 init_db()
 
-# @app.errorhandler(404)
-# def not_found(e):
-#     return "Invalid/Broken URL"
+@app.errorhandler(404)
+def not_found(e):
+    return "Invalid/Broken URL"
 
 @app.errorhandler(500)
 def not_found(e):
@@ -55,6 +56,7 @@ app.register_blueprint(auth_blueprint, url_prefix='/auth')
 app.register_blueprint(bucket_blueprint, url_prefix='/bucket')
 app.register_blueprint(memories_blueprint, url_prefix='/memories')
 app.register_blueprint(diary_blueprint, url_prefix='/diary')
+app.register_blueprint(chat_blueprint, url_prefix='/chat')
 
 if __name__ == "__main__":
     app.run()

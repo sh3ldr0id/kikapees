@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Chat - {{ other }}</title>
+<style>
+    body {
+        height: 100vh;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<h1>Chats</h1>
+<div class="d-flex flex-column rounded shadow border mt-3" style="width: 75%; height: 25%;">
+    <div class="chats d-flex flex-fill flex-column justify-content-end" id="chats" style="height: 100%; overflow-y: auto;">
+    </div>
+    <div class="d-flex align-items-center border-top shadow-top" style="width: 100%;">
+        <input class="shadow-sm border m-2 p-2 bg-body-tertiary rounded" type="text" id="msg" style="width: 100%;">
+        <input type="submit" id="sendButton" class="btn btn-success my-2 me-2 p-2 rounded border d-flex justify-content-center align-items-center" value="Send">
+    </div>
+</div>
+
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCuKrzzrmxKQDvgAIB7NoEymWH9N-uXctQ",
+        authDomain: "kikapees.firebaseapp.com",
+        databaseURL: "https://kikapees-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "kikapees",
+        storageBucket: "kikapees.appspot.com",
+        messagingSenderId: "282637152751",
+        appId: "1:282637152751:web:76dc231b4ae36ff4c1061a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+
+    const database = getDatabase(app);
+
+    const chats = ref(database, 'chats/all/');
+    const unread = ref(database, 'chats/unread/');
+
+    const chats_element = document.getElementById("chats");
+
+    onValue(unread, (snapshot) => {
+        const data = snapshot.val();
+
+        const keys = Object.keys(data);
+
+        keys.forEach(key => {
+            const user = data["key"];
+
+            if (data.user != "{{ other }}") {   
+                chats_element.innerHTML += `
+                <div class="msg-container d-flex justify-content-end" style="width: 100%;">
+                    <p class="rounded shadow-sm m-2 px-2 btn btn-success">${data.msg}</p>
+                </div>
+                `;
+            } else {
+                chats_element.innerHTML += `
+                <div class="msg-container d-flex justify-content-start" style="width: 100%;">
+                    <p class="rounded shadow-sm m-2 px-2 btn btn-primary">${data.msg}</p>
+                </div>
+                `;
+                
+            }
+
+            if (data.user == "{{ user }}") {
+                const message = ref(database, "chats/all/${key}")
+            }
+        })
+        
+    });
+
+    function send() {
+        var element = document.getElementById("msg");
+
+        push(chats, {
+            "content": element.value,
+            "by": "{{ user }}",
+            "timestamp": Math.floor(new Date().getTime() / 1000),
+            "read": false,
+            "deleted": false
+        })
+
+        element.value = "";
+    }
+
+    document.getElementById("sendButton").addEventListener("click", send)
+</script>
+{% endblock %}
