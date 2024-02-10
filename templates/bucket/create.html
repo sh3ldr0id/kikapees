@@ -3,11 +3,6 @@
 {% block head %}
 <title>Create a To Do</title>
 <style>
-    body {
-        height: 100vh;
-        align-items: center;
-    }
-
     .cont {
         width: 60%;
     }
@@ -27,6 +22,26 @@
 {% endblock %}
 
 {% block body %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary" style="width: 100%;">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">KiKaPeeS</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse " id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link active" aria-current="page" href="/bucket">Bucket</a>
+                <a class="nav-link" href="/memories">Memories</a>
+                <a class="nav-link" href="/diary">Diary</a>
+                <a class="nav-link" href="/auth/sessions">Sessions</a>
+                <a class="nav-link text-danger" href="/auth/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -35,18 +50,18 @@
     </ol>
 </nav>
 
-<div class="d-flex justify-content-center align-items-center flex-column border rounded shadow cont">
+<div class="d-flex justify-content-center align-items-center flex-column border rounded shadow my-4 cont">
     <h2 class="my-3">Add a Fish</h2>
-    <form action="#" method="post" class="d-flex justify-content-center flex-column"
-        style="width: 75%;">
-    
+    <form action="#" method="post" class="d-flex justify-content-center flex-column" style="width: 75%;">
+
         <div class="mb-3">
             <label for="titleInput" class="form-label">Title</label>
             <input name="title" type="text" class="form-control" id="titleInput" placeholder="Name the fish">
         </div>
         <div class="mb-3">
             <label for="descriptionInput" class="form-label">Description</label>
-            <textarea name="description" class="form-control" id="descriptionInput" rows="3" placeholder="Feed the fish"></textarea>
+            <textarea name="description" class="form-control" id="descriptionInput" rows="3"
+                placeholder="Feed the fish"></textarea>
         </div>
         <button class="shadow-sm rounded btn btn-success  mt-3 mb-4" type="submit">Submit</button>
     </form>

@@ -13,7 +13,7 @@ blueprint = Blueprint(
 
 def get_location(ip_address):
     try:
-        response = requests.get(f'https://api.iplocation.net/?cmd=ip-country&ip={ip_address}').json()
+        response = requests.get(f'https://api.iplocation.net/?ip={ip_address}').json()
 
         location_data = {
             "city": response.get("city"),

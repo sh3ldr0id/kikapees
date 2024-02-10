@@ -41,12 +41,11 @@ def view(date, user):
     
     page = db.reference(f"diary/{date}/{user}").get()
         
-    return render_template("diary/page.html", date=date.strftime('%A, %d %B %Y'), user=authorized.capitalize(), page=page)
+    return render_template("diary/page.html", date=date.strftime('%A, %d %B %Y'), user=other(user).capitalize(), page=page)
     
 @blueprint.route('/write/<custom_date:date>', methods=["GET", "POST"])
 def write(date):
     if not date:
-        print(date)
         return redirect("/404")
 
     token = session.get("token")
@@ -55,11 +54,9 @@ def write(date):
 
     if not authorized:
         return redirect("/")
-    
-    user = authorized["user"]
 
     if request.method == "GET":
-        page = db.reference(f"diary/{date}/{user}").get()
+        page = db.reference(f"diary/{date}/{authorized}").get()
 
         return render_template("diary/write.html", date=date.strftime('%A, %d %B %Y'), other=other(authorized).capitalize(), page=page)
     
@@ -67,7 +64,7 @@ def write(date):
         content = request.form["content"]
     
         page = db.reference(f"diary/{date}").update({
-            user: content
+            authorized: content
         })
 
-        return redirect(f"/diary/view/{date}/{user}")
+        return redirect(f"/diary/view/{date}/{authorized}")

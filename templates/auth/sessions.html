@@ -5,7 +5,27 @@
 {% endblock %}
 
 {% block body %}
-<div class="g-container">
+<nav class="navbar navbar-expand-lg bg-body-tertiary" style="width: 100%;">
+    <div class="container-fluid" >
+        <a class="navbar-brand" href="#">KiKaPeeS</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse " id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="/bucket">Bucket</a>
+                <a class="nav-link" href="/memories">Memories</a>
+                <a class="nav-link" href="/diary">Diary</a>
+                <a class="nav-link active" aria-current="page" href="#">Sessions</a>
+                <a class="nav-link text-danger" href="/auth/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="g-container my-4">
     {% for session in sessions %}
     <div class="card m-2 shadow" style="width: 18rem;">
         <div class="card-body">
