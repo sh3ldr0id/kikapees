@@ -1,6 +1,7 @@
 from flask import Blueprint, request, redirect, render_template, session
 from firebase_admin import db
 from datetime import datetime
+from app import socketio
 
 blueprint = Blueprint(
     'chat', 
@@ -26,3 +27,18 @@ def home():
         return redirect("/")
 
     return render_template("chat/home.html", user=authorized, other=other(authorized))
+
+@socketio.on('connect')
+def connected():
+    print('Connecteddd')
+
+@socketio.on('new')
+def new(data):
+    token = data["token"]
+
+    authorized = db.reference(f"auth/{token}").get()
+
+    if not authorized:
+        return redirect("/")
+    
+    content = data["content"]
