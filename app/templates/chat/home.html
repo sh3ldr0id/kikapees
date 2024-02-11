@@ -22,57 +22,66 @@
     </div>
 </div>
 
-<script type="module">
-    import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
-
-    const socket = io();
-
+<script>
     const chats = document.getElementById("chats");
     const messageInput = document.getElementById("messageInput");
-    
-    socket.on('connect', function () {
-        console.log("Connected to server")
-    });
-    
-    socket.on('new', function (message) {
-        if (message.by == "{{ user }}") {
-            chats.innerHTML += `
-            <div class="msg-container d-flex justify-content-end" style="width: 100%;">
-                <p class="rounded shadow-sm m-2 px-2 btn btn-success">${message.content}</p>
-            </div>
-            `
-        } else {
-            chats.innerHTML += `
-            <div class="msg-container d-flex justify-content-start" style="width: 100%;">
-                <p class="rounded shadow-sm m-2 px-2 btn btn-primary">${message.content}</p>
-            </div>
-            `
-        }
 
-        chats.scrollTop = chats.scrollHeight;
-    });
+    function getUpdates() {
+        fetch(`/chat/polling`)
+            .then(response => response.json())
+            .then(message => {
 
-    document.getElementById("sendButton").addEventListener("click", () => {
-        socket.emit("new", {
+                chats.innerHTML += `
+                <div class="msg-container d-flex justify-content-start" style="width: 100%;">
+                    <p class="rounded shadow-sm m-2 px-2 btn btn-primary">${message.content}</p>
+                </div>
+                `
+
+                chats.scrollTop = chats.scrollHeight;
+
+                getUpdates();
+            });
+    }
+
+    function sendMessage() {
+        const message = {
             "token": "{{ token }}",
             "content": messageInput.value,
             "by": "{{ user }}",
             "timestamp": Math.floor(new Date().getTime() / 1000)
+        }
+
+        fetch('/chat/message', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(message)
         })
+            .then(response => response.json())
+            .then(data => {
+                chats.innerHTML += `
+                <div class="msg-container d-flex justify-content-end" style="width: 100%;">
+                    <p class="rounded shadow-sm m-2 px-2 btn btn-success">${message.content}</p>
+                </div>
+                `
+
+                chats.scrollTop = chats.scrollHeight;
+                
+                console.log('Message sent successfully:', data);
+            });
 
         messageInput.value = "";
-    })
+    }
+
+    document.getElementById("sendButton").addEventListener("click", sendMessage)
 
     document.getElementById("messageInput").addEventListener("keypress", (event) => {
         if (event.key == "Enter") {
-            socket.emit("new", {
-                "token": "{{ token }}",
-                "content": messageInput.value,
-                "by": "{{ user }}",
-                "timestamp": Math.floor(new Date().getTime() / 1000)
-            })
-            messageInput.value = "";
+            sendMessage()
         }
     })
+
+    getUpdates();
 </script>
 {% endblock %}

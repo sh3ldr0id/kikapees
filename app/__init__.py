@@ -2,8 +2,6 @@ from flask import Flask, session, redirect, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
 from app.database.database import init_db
 from firebase_admin import db
-from flask_socketio import SocketIO
-
 from werkzeug.routing import BaseConverter
 from datetime import datetime
 
@@ -18,7 +16,6 @@ class CustomDateConverter(BaseConverter):
     def to_url(self, value):
         return value.strftime('%Y-%m-%d')
 
-socketio = SocketIO()
 
 def create_app(host="127.0.0.1", port=5000):
     app = Flask(__name__)
@@ -61,7 +58,5 @@ def create_app(host="127.0.0.1", port=5000):
     app.register_blueprint(memories_blueprint, url_prefix='/memories')
     app.register_blueprint(diary_blueprint, url_prefix='/diary')
     app.register_blueprint(chat_blueprint, url_prefix='/chat')
-
-    socketio.init_app(app)
 
     return app

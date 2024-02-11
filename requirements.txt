@@ -2,4 +2,3 @@ flask
 firebase-admin
 uuid
 requests
-flask-socketio

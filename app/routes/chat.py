@@ -1,8 +1,7 @@
 from flask import Blueprint, request, redirect, render_template, session
 from firebase_admin import db
 from datetime import datetime
-from app import socketio
-from flask_socketio import emit
+from time import sleep
 
 blueprint = Blueprint(
     'chat', 
@@ -29,22 +28,21 @@ def home():
 
     return render_template("chat/home.html", token=token, user=authorized, other=other(authorized))
 
-@socketio.on('connect')
-def connected():
-    print('Connecteddd')
+new = []
+prev_len = len(new)
 
-@socketio.on('new')
-def new(data):
-    token = data["token"]
+@blueprint.route('/message', methods=["POST"])
+def new_message():
+    token = session.get("token")
 
     authorized = db.reference(f"auth/{token}").get()
 
     if not authorized:
         return redirect("/")
-    
-    content = data["content"]
-    by = data["by"]
-    timestamp = data["timestamp"]
+        
+    content = request.json["content"]
+    by = request.json["by"]
+    timestamp = request.json["timestamp"]
 
     db.reference("chats/all").push({
         "content": content,
@@ -54,4 +52,28 @@ def new(data):
         "deleted": False
     })
 
-    emit("new", data, broadcast=True)
+    new.append(request.json)
+
+    return {}
+
+@blueprint.route('/polling')
+def polling():
+    global prev_len
+
+    token = session.get("token")
+
+    authorized = db.reference(f"auth/{token}").get()
+
+    if not authorized:
+        return redirect("/")
+
+    found = False
+
+    while not found:
+        for index, message in enumerate(new):
+            if message["by"] != authorized:
+                new.pop(index)
+                
+                return message
+
+        sleep(1)
