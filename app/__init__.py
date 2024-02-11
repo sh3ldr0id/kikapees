@@ -20,7 +20,7 @@ class CustomDateConverter(BaseConverter):
 
 socketio = SocketIO()
 
-def create_app():
+def create_app(host="127.0.0.1", port=5000):
     app = Flask(__name__)
     app.secret_key = 'SECRET_KEY'
 

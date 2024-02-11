@@ -31,7 +31,7 @@
     const messageInput = document.getElementById("messageInput");
     
     socket.on('connect', function () {
-        socket.emit('my event', { data: 'I\'m connected!' });
+        console.log("Connected to server")
     });
     
     socket.on('new', function (message) {
@@ -59,15 +59,20 @@
             "by": "{{ user }}",
             "timestamp": Math.floor(new Date().getTime() / 1000)
         })
+
+        messageInput.value = "";
     })
 
-    document.getElementById("sendButton").addEventListener("click", () => {
-        socket.emit("new", {
-            "token": "{{ token }}",
-            "content": messageInput.value,
-            "by": "{{ user }}",
-            "timestamp": Math.floor(new Date().getTime() / 1000)
-        })
+    document.getElementById("messageInput").addEventListener("keypress", (event) => {
+        if (event.key == "Enter") {
+            socket.emit("new", {
+                "token": "{{ token }}",
+                "content": messageInput.value,
+                "by": "{{ user }}",
+                "timestamp": Math.floor(new Date().getTime() / 1000)
+            })
+            messageInput.value = "";
+        }
     })
 </script>
 {% endblock %}
