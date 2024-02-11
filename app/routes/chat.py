@@ -28,6 +28,29 @@ def home():
 
     return render_template("chat/home.html", token=token, user=authorized, other=other(authorized))
 
+@blueprint.route('/get/<timestamp>')
+def get_messages(timestamp):
+    token = session.get("token")
+
+    authorized = db.reference(f"auth/{token}").get()
+
+    if not authorized:
+        return redirect("/")
+    
+    messages = db.reference("chats").order_by_child("timestamp").end_at(int(timestamp)).limit_to_last(10).get()
+
+    messages = list(messages.values()) if messages else []
+    
+    new_messages = []
+
+    for message in messages:
+        if message["timestamp"] >= int(timestamp):
+            break
+
+        new_messages.append(message)
+
+    return new_messages if new_messages else {}
+
 new = []
 prev_len = len(new)
 
@@ -44,7 +67,7 @@ def new_message():
     by = request.json["by"]
     timestamp = request.json["timestamp"]
 
-    db.reference("chats/all").push({
+    db.reference("chats").push({
         "content": content,
         "by": by,
         "timestamp": timestamp,
@@ -73,7 +96,7 @@ def polling():
         for index, message in enumerate(new):
             if message["by"] != authorized:
                 new.pop(index)
-                
+
                 return message
 
-        sleep(1)
+        sleep(0.25)

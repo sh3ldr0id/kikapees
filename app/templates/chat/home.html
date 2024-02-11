@@ -6,12 +6,51 @@
     body {
         height: 100vh;
     }
+
+    .cont{
+        height: 75%;
+        width: 75%;
+    }
+
+    @media (max-width: 950px) {
+        .cont {
+            height: 85%;
+            width: 85%;
+        }
+    }
+
+    @media (max-width: 650px) {
+        .cont {
+            height: 100%;
+            width: 100%;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block body %}
-<h1>Chats</h1>
-<div class="d-flex flex-column rounded shadow border mt-3" style="width: 75%; height: 30%;">
+<nav class="navbar navbar-expand-lg bg-body-tertiary" style="width: 100%;">
+    <div class="container-fluid" >
+        <a class="navbar-brand" href="#">KiKaPeeS</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse " id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="/bucket">Bucket</a>
+                <a class="nav-link active" href="/memories">Memories</a>
+                <a class="nav-link" href="/diary">Diary</a>
+                <a class="nav-link active" aria-current="page" href="#">Chat</a>
+                <a class="nav-link" href="/auth/sessions">Sessions</a>
+                <a class="nav-link text-danger" href="/auth/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="d-flex flex-column rounded shadow border my-3 cont">
     <div class="chats" id="chats" style="height: 100%; overflow-y: auto;"></div>
     <div class="d-flex align-items-center border-top shadow-top" style="width: 100%;">
         <input class="shadow-sm border m-2 p-2 bg-body-tertiary rounded" type="text" id="messageInput"
@@ -25,6 +64,57 @@
 <script>
     const chats = document.getElementById("chats");
     const messageInput = document.getElementById("messageInput");
+
+    var startTimestamp = 999999999999999;
+
+    function getMessages(timestamp, s) {
+
+        fetch(`/chat/get/${timestamp}`, {
+            method: 'GET'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (startTimestamp > data[0].timestamp) {
+                    startTimestamp = data[0].timestamp
+                    
+                    data = data.reverse();
+                    data.forEach(message => {
+                        var element;
+    
+                        if (message.by == "{{ user }}") {
+                            element = `
+                            <div class="msg-container d-flex justify-content-end" style="width: 100%;">
+                                <p class="rounded shadow-sm m-2 px-2 btn btn-success">${message.content}</p>
+                            </div>
+                            `
+                        } else {
+                            element = `
+                            <div class="msg-container d-flex justify-content-start" style="width: 100%;">
+                                <p class="rounded shadow-sm m-2 px-2 btn btn-primary">${message.content}</p>
+                            </div>
+                            `
+                        }
+    
+                        chats.innerHTML = element + chats.innerHTML
+
+                        if (s) {
+                            chats.scrollTop = chats.scrollHeight;
+                        }
+                    })
+                }
+            });
+    }
+
+    getMessages(
+        Math.floor(new Date().getTime() / 1000),
+        true
+    );
+
+    chats.addEventListener("scroll", () => {
+        if (chats.scrollTop == 0) {
+            getMessages(startTimestamp);
+        }
+    })
 
     function getUpdates() {
         fetch(`/chat/polling`)
@@ -67,7 +157,7 @@
                 `
 
                 chats.scrollTop = chats.scrollHeight;
-                
+
                 console.log('Message sent successfully:', data);
             });
 
