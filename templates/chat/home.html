@@ -11,7 +11,7 @@
 
 {% block body %}
 <h1>Chats</h1>
-<div class="d-flex flex-column rounded shadow border mt-3" style="width: 75%; height: 25%;">
+<div class="d-flex flex-column rounded shadow border mt-3" style="width: 75%; height: 75%;">
     <div class="chats d-flex flex-fill flex-column justify-content-end" id="chats" style="height: 100%; overflow-y: auto;">
     </div>
     <div class="d-flex align-items-center border-top shadow-top" style="width: 100%;">
@@ -23,7 +23,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, onChildChanged, push, query, update, get, orderByChild, startAt } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCuKrzzrmxKQDvgAIB7NoEymWH9N-uXctQ",
@@ -40,50 +40,83 @@
     const database = getDatabase(app);
 
     const chats = ref(database, 'chats/all/');
-    const unread = ref(database, 'chats/unread/');
-
+    const unread = ref(database, 'chats/unread/{{ other }}')
     const chats_element = document.getElementById("chats");
-
-    onValue(unread, (snapshot) => {
+    
+    onValue(ref(database, "chats/unread/{{ user }}"), (snapshot) => {
         const data = snapshot.val();
 
-        const keys = Object.keys(data);
+        if (data) {
+            const chref = ref(database, "chats/all/");
 
-        keys.forEach(key => {
-            const user = data["key"];
+            var results = query(chref, orderByChild("timestamp"));
+            results = query(results, startAt(data))
 
-            if (data.user != "{{ other }}") {   
-                chats_element.innerHTML += `
-                <div class="msg-container d-flex justify-content-end" style="width: 100%;">
-                    <p class="rounded shadow-sm m-2 px-2 btn btn-success">${data.msg}</p>
-                </div>
-                `;
-            } else {
-                chats_element.innerHTML += `
-                <div class="msg-container d-flex justify-content-start" style="width: 100%;">
-                    <p class="rounded shadow-sm m-2 px-2 btn btn-primary">${data.msg}</p>
-                </div>
-                `;
-                
-            }
+            get(results).then(results => {
+                results = results.val()
+                const keys = Object.keys(results)
+    
+                keys.forEach(key => {    
+                    var result = ref(database, "chats/all/" + key)
+    
+                    update(result, {
+                        "read": true
+                    })
+                    
+                    result = get(result).then(data => {
+                        data = data.val()
+                        if (data.by != "{{ other }}") {   
+                            chats_element.innerHTML += `
+                            <div class="msg-container d-flex justify-content-end" style="width: 100%;">
+                                <p class="rounded shadow-sm m-2 px-2 btn btn-success">${data.content}</p>
+                            </div>
+                            `;
+                        } else {
+                            chats_element.innerHTML += `
+                            <div class="msg-container d-flex justify-content-start" style="width: 100%;">
+                                <p class="rounded shadow-sm m-2 px-2 btn btn-primary">${data.content}</p>
+                            </div>
+                            `;
+                            
+                        }
+                    })
+                })
+            })
+            
 
-            if (data.user == "{{ user }}") {
-                const message = ref(database, "chats/all/${key}")
-            }
-        })
-        
+            update(ref(database, "chats/unread/"), {
+                "{{ user }}": false
+            }) 
+        }
     });
 
     function send() {
         var element = document.getElementById("msg");
 
-        push(chats, {
+        const message = {
             "content": element.value,
             "by": "{{ user }}",
             "timestamp": Math.floor(new Date().getTime() / 1000),
             "read": false,
             "deleted": false
+        }
+
+        push(chats, message)
+
+        chats_element.innerHTML += `
+        <div class="msg-container d-flex justify-content-end" style="width: 100%;">
+            <p class="rounded shadow-sm m-2 px-2 btn btn-success">${message.content}</p>
+        </div>
+        `;
+
+        get(ref(database, 'chats/unread/{{ other }}')).then(result => {
+            if (!result.val()) {
+                update(ref(database, "chats/unread"), {
+                    "{{ other }}": message.timestamp
+                })
+            }
         })
+        
 
         element.value = "";
     }
