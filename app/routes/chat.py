@@ -103,8 +103,6 @@ def polling():
                 "read": True
             })
 
-            print("read")
-
             return message
 
     return {}
