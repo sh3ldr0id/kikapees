@@ -49,7 +49,7 @@ def get_messages(timestamp):
 
         new_messages.append(message)
 
-    return new_messages if new_messages else {}
+    return {"messages": new_messages} if new_messages else {}
 
 new = []
 prev_len = len(new)
