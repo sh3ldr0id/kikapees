@@ -8,22 +8,19 @@
     }
 
     .cont {
-        height: 75%;
-        width: 75%;
+        height: 90%;
+        width: 100%;
     }
 
-    @media (max-width: 950px) {
-        .cont {
-            height: 85%;
-            width: 85%;
-        }
+    .msg {
+        color: white;
     }
 
-    @media (max-width: 650px) {
-        .cont {
-            height: 100%;
-            width: 100%;
-        }
+    .user {
+        background-color: #198754;
+    }
+    .other {
+        background-color: #0d6efd;
     }
 </style>
 {% endblock %}
@@ -40,7 +37,7 @@
             <div class="navbar-nav">
                 <a class="nav-link" href="/">Home</a>
                 <a class="nav-link" href="/bucket">Bucket</a>
-                <a class="nav-link active" href="/memories">Memories</a>
+                <a class="nav-link" href="/memories">Memories</a>
                 <a class="nav-link" href="/diary">Diary</a>
                 <a class="nav-link active" aria-current="page" href="#">Chat</a>
                 <a class="nav-link" href="/auth/sessions">Sessions</a>
@@ -50,8 +47,8 @@
     </div>
 </nav>
 
-<div class="d-flex flex-column rounded shadow border my-3 cont">
-    <div class="chats" id="chats" style="height: 100%; overflow-y: auto;"></div>
+<div class="d-flex flex-column rounded shadow border cont">
+    <div class="chats pt-2" id="chats" style="height: 100%; overflow-y: auto;"></div>
     <div class="d-flex align-items-center border-top shadow-top" style="width: 100%;">
         <input class="shadow-sm border m-2 p-2 bg-body-tertiary rounded" type="text" id="messageInput"
             style="width: 100%;">
@@ -67,12 +64,58 @@
 
     var startTimestamp = 999999999999999;
 
+    function generateMessageElement(message) {
+        var element;
+
+        if (message.by == "{{ user }}") {
+            element = `
+                <div class="d-flex justify-content-end" style="width: 100%;">
+                    <div class="dropdown me-2 ms-3">
+                        <div data-bs-toggle="dropdown" aria-expanded="false" class="rounded msg user">
+                            <p class="p-2" style="white-space: pre-wrap;">${message.content}</p>
+                        </div>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" onclick="reply('${message.uid}')">Reply</a></li>
+                            <li><a class="dropdown-item" onclick="copyMessage('${message.content}')">Copy</a></li>
+                            <li><a class="dropdown-item text-danger" onclick="deleteMessage('${message.uid}')">Delete</a></li>
+                        </ul>
+                    </div>
+                </div>
+                `
+        } else {
+            element = `
+            <div class="d-flex justify-content-start" style="width: 100%;">
+                <div class="dropdown  ms-2 me-3">
+                    <div data-bs-toggle="dropdown" aria-expanded="false" class="rounded msg other">
+                        <p class="p-2" style="white-space: pre-wrap;">${message.content}</p>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" onclick="reply('${message.uid}')">Reply</a></li>
+                        <li><a class="dropdown-item" onclick="copyMessage('${message.content}')">Copy</a></li>
+                    </ul>
+                </div>
+            </div>
+            `
+        }
+
+        return element;
+    }
+
+    function copyMessage(content) {
+        navigator.clipboard.writeText(content)
+            .then(() => {
+                console.log('Text copied to clipboard');
+            })
+            .catch(err => {
+                console.error('Unable to copy text to clipboard', err);
+            });
+    }
+
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    function getMessages(timestamp) {
-
+    function getMessages(timestamp, s) {
         fetch(`/chat/get/${timestamp}`, {
             method: 'GET'
         })
@@ -85,58 +128,22 @@
 
                     data = data.reverse();
                     data.forEach(message => {
-                        var element;
-
-                        if (message.by == "{{ user }}") {
-                            element = `
-                                <div class="msg-container d-flex justify-content-end" style="width: 100%;">
-                                    <p class="rounded shadow-sm m-2 px-2 btn btn-success">${message.content}</p>
-                                </div>
-                                `
-                        } else {
-                            element = `
-                                <div class="msg-container d-flex justify-content-start" style="width: 100%;">
-                                    <p class="rounded shadow-sm m-2 px-2 btn btn-primary">${message.content}</p>
-                                </div>
-                                `
-                        }
-
-                        chats.innerHTML = element + chats.innerHTML
+                        chats.innerHTML = generateMessageElement(message) + chats.innerHTML;
                     })
                 }
+
+                if (s) chats.scrollTop = chats.scrollHeight;
             });
     }
 
-    getMessages(Math.floor(new Date().getTime() / 1000));
+    getMessages(Math.floor(new Date().getTime() / 1000), true);
 
     chats.addEventListener("scroll", () => {
-        if (chats.scrollTop == 0) {
-            getMessages(startTimestamp);
-        }
+        if (chats.scrollTop == 0) getMessages(startTimestamp);
     })
 
-    function getUpdates() {
-        fetch(`/chat/polling`)
-            .then(response => response.json())
-            .then(async message => {
-                if (message.content) {
-                    chats.innerHTML += `
-                    <div class="msg-container d-flex justify-content-start" style="width: 100%;">
-                        <p class="rounded shadow-sm m-2 px-2 btn btn-primary">${message.content}</p>
-                    </div>
-                    `
-
-                    chats.scrollTop = chats.scrollHeight;
-                }
-                await sleep(200);
-                getUpdates();
-            });
-    }
-
     function sendMessage() {
-        if (messageInput.value == "") {
-            return
-        }
+        if (messageInput.value == "") return
 
         const message = {
             "token": "{{ token }}",
@@ -154,26 +161,33 @@
         })
             .then(response => response.json())
             .then(data => {
-                chats.innerHTML += `
-                <div class="msg-container d-flex justify-content-end" style="width: 100%;">
-                    <p class="rounded shadow-sm m-2 px-2 btn btn-success">${message.content}</p>
-                </div>
-                `
+                chats.innerHTML += generateMessageElement(message);
 
                 chats.scrollTop = chats.scrollHeight;
-
-                console.log('Message sent successfully:', data);
             });
 
         messageInput.value = "";
     }
 
+    function getUpdates() {
+        fetch(`/chat/polling`)
+            .then(response => response.json())
+            .then(async message => {
+                if (message.content) {
+                    chats.innerHTML += generateMessageElement(message);
+                    chats.scrollTop = chats.scrollHeight;
+                }
+
+                await sleep(200);
+
+                getUpdates();
+            });
+    }
+
     document.getElementById("sendButton").addEventListener("click", sendMessage)
 
     document.getElementById("messageInput").addEventListener("keypress", (event) => {
-        if (event.key == "Enter") {
-            sendMessage()
-        }
+        if (event.key == "Enter") sendMessage();
     })
 
     getUpdates();
