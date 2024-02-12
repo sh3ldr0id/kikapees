@@ -67,6 +67,10 @@
 
     var startTimestamp = 999999999999999;
 
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     function getMessages(timestamp) {
 
         fetch(`/chat/get/${timestamp}`, {
@@ -114,16 +118,17 @@
     function getUpdates() {
         fetch(`/chat/polling`)
             .then(response => response.json())
-            .then(message => {
+            .then(async message => {
+                if (message.content) {
+                    chats.innerHTML += `
+                    <div class="msg-container d-flex justify-content-start" style="width: 100%;">
+                        <p class="rounded shadow-sm m-2 px-2 btn btn-primary">${message.content}</p>
+                    </div>
+                    `
 
-                chats.innerHTML += `
-                <div class="msg-container d-flex justify-content-start" style="width: 100%;">
-                    <p class="rounded shadow-sm m-2 px-2 btn btn-primary">${message.content}</p>
-                </div>
-                `
-
-                chats.scrollTop = chats.scrollHeight;
-
+                    chats.scrollTop = chats.scrollHeight;
+                }
+                await sleep(200);
                 getUpdates();
             });
     }

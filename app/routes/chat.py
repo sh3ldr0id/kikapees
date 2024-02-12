@@ -90,13 +90,10 @@ def polling():
     if not authorized:
         return redirect("/")
 
-    found = False
+    for index, message in enumerate(new):
+        if message["by"] != authorized:
+            new.pop(index)
 
-    while not found:
-        for index, message in enumerate(new):
-            if message["by"] != authorized:
-                new.pop(index)
+            return message
 
-                return message
-
-        sleep(0.25)
+    return {}
