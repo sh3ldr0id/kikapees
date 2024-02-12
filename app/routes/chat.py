@@ -38,14 +38,17 @@ def get_messages(timestamp):
         return redirect("/")
     
     messages = db.reference("chats").order_by_child("timestamp").end_at(int(timestamp)).limit_to_last(10).get()
-
-    messages = list(messages.values()) if messages else []
     
     new_messages = []
 
-    for message in messages:
+    for uid, message in zip(messages.keys(), messages.values()):
         if message["timestamp"] >= int(timestamp):
             break
+
+        if message["by"] != authorized and not message["read"]:
+            db.reference(f"chats/{uid}").update({
+                "read": True
+            })
 
         new_messages.append(message)
 
@@ -67,15 +70,17 @@ def new_message():
     by = request.json["by"]
     timestamp = request.json["timestamp"]
 
-    db.reference("chats").push({
+    key = db.reference("chats").push({
         "content": content,
         "by": by,
         "timestamp": timestamp,
         "read": False,
         "deleted": False
-    })
+    }).key
 
     new.append(request.json)
+
+    new[-1]["uid"] = key
 
     return {}
 
@@ -93,6 +98,12 @@ def polling():
     for index, message in enumerate(new):
         if message["by"] != authorized:
             new.pop(index)
+
+            db.reference(f"chats/{message['uid']}").update({
+                "read": True
+            })
+
+            print("read")
 
             return message
 
