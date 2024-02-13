@@ -54,7 +54,7 @@ def get_messages(timestamp):
         key = keys[index]
 
         if message["by"] != authorized and not message["read"]:
-            db.reference(f"chats/{keys}").update({
+            db.reference(f"chats/{key}").update({
                 "read": True
             })
 
