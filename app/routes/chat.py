@@ -39,18 +39,28 @@ def get_messages(timestamp):
     
     messages = db.reference("chats").order_by_child("timestamp").end_at(int(timestamp)).limit_to_last(10).get()
     
+    keys = list(messages.keys())
+    values = messages.values()
+
     new_messages = []
 
-    for uid, message in zip(messages.keys(), messages.values()):
+    for index, message in enumerate(values):
         if message["timestamp"] >= int(timestamp):
             break
 
+        if message["deleted"]:
+            continue
+
+        key = keys[index]
+
         if message["by"] != authorized and not message["read"]:
-            db.reference(f"chats/{uid}").update({
+            db.reference(f"chats/{keys}").update({
                 "read": True
             })
 
         new_messages.append(message)
+
+        new_messages[-1]["uid"] = key
 
     return {"messages": new_messages} if new_messages else {}
 
@@ -83,6 +93,30 @@ def new_message():
     new[-1]["uid"] = key
 
     return {}
+
+@blueprint.route('/delete', methods=["DELETE"])
+def delete_message():
+    token = session.get("token")
+
+    authorized = db.reference(f"auth/{token}").get()
+
+    if not authorized:
+        return redirect("/")
+    
+    uid = request.json["uid"]
+
+    reference = db.reference(f"chats/{uid}")
+
+    message = reference.get()
+
+    if not message or message['by'] != authorized:
+        return {"status": "failed"}
+
+    reference.update({
+        "deleted": True
+    })
+
+    return {"status": "success"}
 
 @blueprint.route('/polling')
 def polling():
