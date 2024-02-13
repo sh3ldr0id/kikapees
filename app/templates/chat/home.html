@@ -19,6 +19,7 @@
     .user {
         background-color: #198754;
     }
+
     .other {
         background-color: #0d6efd;
     }
@@ -62,43 +63,68 @@
     const chats = document.getElementById("chats");
     const messageInput = document.getElementById("messageInput");
 
-    var startTimestamp = 999999999999999;
+    var startTimestamp = Math.floor(new Date().getTime() / 1000);
+    var populated = false;
 
     function generateMessageElement(message) {
-        var element;
+        const outerDiv = document.createElement("div");
+        outerDiv.classList.add("d-flex");
+        outerDiv.id = message.uid;
+        outerDiv.style.width = "100%";
 
-        if (message.by == "{{ user }}") {
-            element = `
-                <div class="d-flex justify-content-end" id="${message.uid}" style="width: 100%;">
-                    <div class="dropdown me-2 ms-3">
-                        <div data-bs-toggle="dropdown" aria-expanded="false" class="rounded msg user">
-                            <p class="p-2" style="white-space: pre-wrap;">${message.content}</p>
-                        </div>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" onclick="reply('${message.uid}')">Reply</a></li>
-                            <li><a class="dropdown-item" onclick="copyMessage('${message.content}')">Copy</a></li>
-                            <li><a class="dropdown-item text-danger" onclick="deleteMessage('${message.uid}')">Delete</a></li>
-                        </ul>
-                    </div>
-                </div>
-                `
-        } else {
-            element = `
-            <div class="d-flex justify-content-start" style="width: 100%;">
-                <div class="dropdown  ms-2 me-3">
-                    <div data-bs-toggle="dropdown" aria-expanded="false" class="rounded msg other">
-                        <p class="p-2" style="white-space: pre-wrap;">${message.content}</p>
-                    </div>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" onclick="reply('${message.uid}')">Reply</a></li>
-                        <li><a class="dropdown-item" onclick="copyMessage('${message.content}')">Copy</a></li>
-                    </ul>
-                </div>
-            </div>
-            `
+        const dropdownDiv = document.createElement("div");
+        
+        const contentDiv = document.createElement("div");
+        contentDiv.setAttribute("data-bs-toggle", "dropdown");
+        contentDiv.setAttribute("aria-expanded", "false");
+        contentDiv.classList.add("rounded", "msg");
+
+        const contentParagraph = document.createElement("p");
+        contentParagraph.classList.add("p-2");
+        contentParagraph.style.whiteSpace = "pre-wrap";
+        contentParagraph.textContent = message.content;
+
+        contentDiv.appendChild(contentParagraph);
+
+        const dropdownMenu = document.createElement("ul");
+        dropdownMenu.classList.add("dropdown-menu");
+
+        const replyItem = createDropdownItem("Reply", () => reply(message.uid));
+        const copyItem = createDropdownItem("Copy", () => copyMessage(message.content));
+
+        dropdownMenu.appendChild(replyItem);
+        dropdownMenu.appendChild(copyItem);
+
+        dropdownDiv.appendChild(contentDiv);
+        dropdownDiv.appendChild(dropdownMenu);
+
+        outerDiv.appendChild(dropdownDiv);
+
+        function createDropdownItem(text, onClick) {
+            const item = document.createElement("li");
+            const link = document.createElement("a");
+            link.classList.add("dropdown-item");
+            link.textContent = text;
+            link.addEventListener("click", onClick);
+            item.appendChild(link);
+            return item;
         }
 
-        return element;
+        if (message.by == "{{ user }}") {
+            outerDiv.classList.add("justify-content-end");
+            dropdownDiv.classList.add("dropdown", "me-2", "ms-3");
+            contentDiv.classList.add("user")
+
+            const deleteItem = createDropdownItem("Delete", () => deleteMessage(message.uid));
+            dropdownMenu.appendChild(deleteItem);
+
+        } else {
+            outerDiv.classList.add("justify-content-start")
+            dropdownDiv.classList.add("dropdown", "ms-2", "me-3");
+            contentDiv.classList.add("other")
+        }
+
+        return outerDiv;
     }
 
     function copyMessage(content) {
@@ -115,31 +141,39 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    function getMessages(timestamp, s) {
-        fetch(`/chat/get/${timestamp}`, {
-            method: 'GET'
-        })
-            .then(response => response.json())
-            .then(data => {
-                data = data.messages
+    async function getMessages(s) {
+        var request = await fetch(`/chat/get/${startTimestamp}`)
 
-                if (startTimestamp > data[0].timestamp) {
-                    startTimestamp = data[0].timestamp
+        var data = await request.json()
 
-                    data = data.reverse();
-                    data.forEach(message => {
-                        chats.innerHTML = generateMessageElement(message) + chats.innerHTML;
-                    })
-                }
+        data = data.messages
 
-                if (s) chats.scrollTop = chats.scrollHeight;
-            });
+        if (startTimestamp > data[0].timestamp) {
+            startTimestamp = data[0].timestamp
+
+            data = data.reverse();
+
+            data.forEach(message => {
+                chats.insertBefore(generateMessageElement(message), chats.firstChild);
+            })
+        }
+
+        if (chats.scrollHeight <= chats.clientHeight) {
+            getMessages(true)
+        } else {
+            if (s) chats.scrollTop = chats.scrollHeight;
+        }
     }
 
-    getMessages(Math.floor(new Date().getTime() / 1000), true);
+    getMessages();
 
     chats.addEventListener("scroll", () => {
-        if (chats.scrollTop == 0) getMessages(startTimestamp);
+        if (chats.scrollTop == 0) {
+
+            getMessages()
+
+            chats.scrollTop = 10;
+        }
     })
 
     function sendMessage() {
@@ -161,8 +195,8 @@
         })
             .then(response => response.json())
             .then(data => {
-                chats.innerHTML += generateMessageElement(message);
-
+                message.uid = data.uid
+                chats.appendChild(generateMessageElement(message));
                 chats.scrollTop = chats.scrollHeight;
             });
 
@@ -170,19 +204,17 @@
     }
 
     function deleteMessage(uid) {
+        console.log(uid)
         fetch('/chat/delete', {
-            method: 'DELETE',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({"uid": uid})
+            body: JSON.stringify({ "uid": uid })
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
-                
                 element = document.getElementById(uid)
-
                 chats.removeChild(element)
             });
     }
@@ -190,13 +222,24 @@
     function getUpdates() {
         fetch(`/chat/polling`)
             .then(response => response.json())
-            .then(async message => {
-                if (message.content) {
-                    chats.innerHTML += generateMessageElement(message);
-                    chats.scrollTop = chats.scrollHeight;
-                }
+            .then(async data => {
+                    if (data.action == "new") {
+                        const message = data.message
 
-                await sleep(200);
+                        chats.appendChild(generateMessageElement(message));
+                        chats.scrollTop = chats.scrollHeight;
+
+                    } else if (data.action == "delete") {
+                        const uid = data.uid;
+
+                        element = document.getElementById(uid);
+                        chats.removeChild(element)
+
+                        console.log("deleted shit")
+
+                    } else {
+                        await sleep(500);
+                    }
 
                 getUpdates();
             });

@@ -1,7 +1,5 @@
 from flask import Blueprint, request, redirect, render_template, session
 from firebase_admin import db
-from datetime import datetime
-from time import sleep
 
 blueprint = Blueprint(
     'chat', 
@@ -37,30 +35,42 @@ def get_messages(timestamp):
     if not authorized:
         return redirect("/")
     
-    messages = db.reference("chats").order_by_child("timestamp").end_at(int(timestamp)).limit_to_last(10).get()
+    window = 3
     
-    keys = list(messages.keys())
-    values = messages.values()
-
+    timestamp = int(timestamp)
+    previous_timestep = timestamp
+    
     new_messages = []
 
-    for index, message in enumerate(values):
-        if message["timestamp"] >= int(timestamp):
+    while len(new_messages) < window:
+        messages = db.reference("chats").order_by_child("timestamp").end_at(timestamp).limit_to_last(window).get()
+        
+        keys = list(messages.keys())
+        values = list(messages.values())
+
+        for index, message in enumerate(values):
+            if message["timestamp"] >= timestamp or len(new_messages) == window:
+                break
+
+            if message["deleted"]:
+                continue
+
+            key = keys[index]
+
+            if message["by"] != authorized and not message["read"]:
+                db.reference(f"chats/{key}").update({
+                    "read": True
+                })
+
+            new_messages.append(message)
+
+            new_messages[-1]["uid"] = key
+
+        previous_timestep = timestamp
+        timestamp = values[0]["timestamp"]
+
+        if previous_timestep == timestamp:
             break
-
-        if message["deleted"]:
-            continue
-
-        key = keys[index]
-
-        if message["by"] != authorized and not message["read"]:
-            db.reference(f"chats/{key}").update({
-                "read": True
-            })
-
-        new_messages.append(message)
-
-        new_messages[-1]["uid"] = key
 
     return {"messages": new_messages} if new_messages else {}
 
@@ -92,9 +102,11 @@ def new_message():
 
     new[-1]["uid"] = key
 
-    return {}
+    return {"uid": key}
 
-@blueprint.route('/delete', methods=["DELETE"])
+deleted = []
+
+@blueprint.route('/delete', methods=["POST"])
 def delete_message():
     token = session.get("token")
 
@@ -102,7 +114,7 @@ def delete_message():
 
     if not authorized:
         return redirect("/")
-    
+        
     uid = request.json["uid"]
 
     reference = db.reference(f"chats/{uid}")
@@ -114,6 +126,11 @@ def delete_message():
 
     reference.update({
         "deleted": True
+    })
+
+    deleted.append({
+        "uid": uid,
+        "by": message["by"]
     })
 
     return {"status": "success"}
@@ -128,6 +145,15 @@ def polling():
 
     if not authorized:
         return redirect("/")
+    
+    for index, message in enumerate(deleted):
+        if message["by"] != authorized:
+            deleted.pop(index)
+
+            return {
+                "action": "delete",
+                "uid": message["uid"] 
+            }
 
     for index, message in enumerate(new):
         if message["by"] != authorized:
@@ -137,6 +163,9 @@ def polling():
                 "read": True
             })
 
-            return message
+            return {
+                "action": "new",
+                "message": message
+            }
 
     return {}
