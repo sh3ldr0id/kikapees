@@ -104,6 +104,7 @@
             const item = document.createElement("li");
             const link = document.createElement("a");
             link.classList.add("dropdown-item");
+            if (text == "Delete") link.classList.add("text-danger");
             link.textContent = text;
             link.addEventListener("click", onClick);
             item.appendChild(link);
@@ -116,7 +117,6 @@
             contentDiv.classList.add("user")
 
             const deleteItem = createDropdownItem("Delete", () => deleteMessage(message.uid));
-            deleteItem.classList.add("text-danger");
             dropdownMenu.appendChild(deleteItem);
 
         } else {
