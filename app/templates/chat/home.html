@@ -116,6 +116,7 @@
             contentDiv.classList.add("user")
 
             const deleteItem = createDropdownItem("Delete", () => deleteMessage(message.uid));
+            deleteItem.classList.add("text-danger");
             dropdownMenu.appendChild(deleteItem);
 
         } else {
