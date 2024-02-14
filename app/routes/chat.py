@@ -1,5 +1,6 @@
 from flask import Blueprint, request, redirect, render_template, session
 from firebase_admin import db
+from datetime import datetime
 
 blueprint = Blueprint(
     'chat', 
@@ -35,7 +36,7 @@ def get_messages(timestamp):
     if not authorized:
         return redirect("/")
     
-    window = 3
+    window = 4
     
     timestamp = int(timestamp)
     previous_timestep = timestamp
@@ -49,7 +50,8 @@ def get_messages(timestamp):
         values = list(messages.values())
 
         for index, message in enumerate(values):
-            if message["timestamp"] >= timestamp or len(new_messages) == window:
+
+            if message["timestamp"] >= timestamp:
                 break
 
             if message["deleted"]:
@@ -71,6 +73,13 @@ def get_messages(timestamp):
 
         if previous_timestep == timestamp:
             break
+
+    new_messages = sorted(new_messages, key=lambda x: x['timestamp'])[-window:]
+
+    for message in new_messages:
+        print(datetime.fromtimestamp(message["timestamp"]), message["content"])
+
+    print("\n nNEWWW \n")
 
     return {"messages": new_messages} if new_messages else {}
 
