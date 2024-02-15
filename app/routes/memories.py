@@ -2,6 +2,7 @@ from flask import Blueprint, request, redirect, render_template, session
 from firebase_admin import db, storage
 from datetime import datetime
 from uuid import uuid4
+from cv2 import VideoCapture, imwrite
 
 blueprint = Blueprint(
     'memories', 
@@ -115,7 +116,32 @@ def upload(uid):
 
             url = blob.public_url
 
+            thumbnail = "https://storage.googleapis.com/kikapees.appspot.com/default_thumbnail.svg"
+
+            if extension in ['mp4', 'avi', 'mkv', 'mov']:
+                file.save(f"temp/{filename}")
+
+                cap = VideoCapture(f"temp/{filename}")
+
+                ret, frame = cap.read()
+                cap.release()
+                
+                if ret:
+                    imwrite(f"temp/{filename.rsplit('.', 1)[0]}.png", frame)
+
+                blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/thumbnails/extracted/{filename.rsplit('.', 1)[0]}.png")
+
+                blob.upload_from_filename(f"temp/{filename.rsplit('.', 1)[0]}.png")
+
+                blob.make_public()
+
+                thumbnail = blob.public_url
+
+            elif extension not in ["png", "jpg", "jpeg", "gif"]:
+                thumbnail = url
+
             db.reference(f"memories/{uid}/files").push({
+                "thumbnail": thumbnail,
                 "filename": filename,
                 "url": url,
                 "uploadedOn": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
