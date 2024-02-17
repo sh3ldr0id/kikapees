@@ -2,7 +2,8 @@ from flask import Blueprint, request, redirect, render_template, session
 from firebase_admin import db, storage
 from datetime import datetime
 from uuid import uuid4
-from cv2 import VideoCapture, imwrite
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from os.path import exists
 
 blueprint = Blueprint(
     'memories', 
@@ -51,24 +52,26 @@ def create():
         return render_template("memories/create.html")
     
     elif request.method == "POST":
-        pfp = request.files.get("pfp")
+        thumbnail = request.files.get("thumbnail")
         title = request.form["title"]
         description = request.form["description"]
         date = request.form["date"]
 
-        if pfp:
-            extension = pfp.filename.rsplit('.', 1)[1]
+        url = "https://img.freepik.com/free-vector/hand-drawn-magical-dreams-background_23-2149672473.jpg?w=740&t=st=1707043517~exp=1707044117~hmac=df44bdc206d7b245b2886041247a1a015b2602fe971638de5987a5274310a364"
 
-            blob = storage.bucket("kikapees.appspot.com").blob(f"pfps/{title}/{uuid4()}.{extension}")
+        if thumbnail:
+            extension = thumbnail.filename.rsplit('.', 1)[1]
 
-            blob.upload_from_file(pfp)
+            blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{title}/thumbnail.{extension}")
+
+            blob.upload_from_file(thumbnail)
 
             url = blob.generate_signed_url(32503680000)
 
         memories = db.reference("memories")
 
         memories.push({
-            "pfp": url if url else "https://img.freepik.com/free-vector/hand-drawn-magical-dreams-background_23-2149672473.jpg?w=740&t=st=1707043517~exp=1707044117~hmac=df44bdc206d7b245b2886041247a1a015b2602fe971638de5987a5274310a364",
+            "thumbnail": url,
             "title": title,
             "description": description,
             "date": date
@@ -104,11 +107,11 @@ def upload(uid):
             filename = file.filename
             extension = filename.rsplit('.', 1)[1]
 
-            while storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/{filename}").exists():
+            while storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/files/{filename}").exists():
                 suffix += 1
                 filename = f'{filename} ({suffix}).{extension}'
 
-            blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/{filename}")
+            blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/files/{filename}")
 
             blob.upload_from_file(file)
 
@@ -121,15 +124,15 @@ def upload(uid):
             if extension in ['mp4', 'avi', 'mkv', 'mov']:
                 file.save(f"temp/{filename}")
 
-                cap = VideoCapture(f"temp/{filename}")
+                thumbnail_filename = f"temp/{str(uuid4())}.png"
 
-                ret, frame = cap.read()
-                cap.release()
-                
-                if ret:
-                    imwrite(f"temp/{filename.rsplit('.', 1)[0]}.png", frame)
+                print(exists(f"temp/{filename}"))
 
-                blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/thumbnails/extracted/{filename.rsplit('.', 1)[0]}.png")
+                clip = VideoFileClip(f"temp/{filename}", audio=False)
+                clip.save_frame(0, thumbnail_filename)
+                clip.close()
+
+                blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/thumbnails/{thumbnail_filename}")
 
                 blob.upload_from_filename(f"temp/{filename.rsplit('.', 1)[0]}.png")
 
@@ -137,7 +140,7 @@ def upload(uid):
 
                 thumbnail = blob.public_url
 
-            elif extension not in ["png", "jpg", "jpeg", "gif"]:
+            elif extension in ["png", "jpg", "jpeg", "gif"]:
                 thumbnail = url
 
             db.reference(f"memories/{uid}/files").push({
@@ -225,7 +228,7 @@ def delete_file(uid, fileId):
     if not file:
         return redirect("/404")
     
-    blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/{file['filename']}")
+    blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/files/{file['filename']}")
     blob.delete()
 
     db.reference(f"memories/{uid}/files").update({fileId: None})
