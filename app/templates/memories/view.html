@@ -48,20 +48,26 @@
 
 <div class="g-container">
     <div class="card m-2 shadow" style="width: 18rem;">
-        <div class="dropdown">
-            <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="position: absolute;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue" class="bi bi-three-dots m-2"
-                    viewBox="0 0 16 16" style="rotate: 90deg;">
-                    <path
-                        d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                </svg>
-            </a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/memories/view/{{ uid }}/open/{{ uid }}">Open</a></li>
-                <li><a class="dropdown-item" href="{{ memory.thumbnail }}">Download</a></li>
-            </ul>
-            <img src="{{ memory.thumbnail }}" height="200px" class="card-img object-fit-cover overflow-hidden">
+        <div class="card-body d-flex">
+            <div class="flex-fill">
+                <h6 class="card-text filename  fs-6">Thumbnail</h6>
+                <p class="card-subtitle text-body-secondary fs-6">{{ memory.date }}</p>
+            </div>
+            <div class="dropdown">
+                <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue"
+                        class="bi bi-three-dots" viewBox="0 0 16 16" style="rotate: 90deg;">
+                        <path
+                            d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                    </svg>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/memories/view/{{ uid }}/open/{{ uid }}">Open</a></li>
+                    <li><a class="dropdown-item" href="{{ memory.thumbnail }}">Download</a></li>
+                </ul>
+            </div>
         </div>
+        <img src="{{ memory.thumbnail }}" height="200px" class="card-img-bottom object-fit-cover overflow-hidden">
     </div>
 
     {% for file in files %}
@@ -87,7 +93,7 @@
                 </ul>
             </div>
         </div>
-        <img src="{{ file.thumbnail }}" height="200px" class="card-img-bottom object-fit-cover overflow-hidden c">
+        <img src="{{ file.thumbnail }}" height="200px" class="card-img-bottom object-fit-cover overflow-hidden">
     </div>
 
     <div class="modal fade" id="deleteModal{{ file.uid }}" tabindex="-1"
