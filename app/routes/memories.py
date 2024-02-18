@@ -2,8 +2,8 @@ from flask import Blueprint, request, redirect, render_template, session
 from firebase_admin import db, storage
 from datetime import datetime
 from uuid import uuid4
-from moviepy.video.io.VideoFileClip import VideoFileClip
-from os.path import exists
+from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, CAP_PROP_POS_FRAMES, imwrite
+from os import remove
 
 blueprint = Blueprint(
     'memories', 
@@ -122,23 +122,36 @@ def upload(uid):
             thumbnail = "https://storage.googleapis.com/kikapees.appspot.com/memories/default_file_thumbnail.svg"
 
             if extension in ['mp4', 'avi', 'mkv', 'mov']:
-                file.save(f"temp/{filename}")
+                fname = f"temp/{str(uuid4())}"
 
-                thumbnail_filename = f"temp/{str(uuid4())}.png"
+                file.seek(0)
 
-                print(exists(f"temp/{filename}"))
+                file.save(f"{fname}.{extension}")
 
-                clip = VideoFileClip(f"temp/{filename}", audio=False)
-                clip.save_frame(0, thumbnail_filename)
-                clip.close()
+                cap = VideoCapture(f"{fname}.{extension}")
 
-                blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/thumbnails/{thumbnail_filename}")
+                frame_count = int(cap.get(CAP_PROP_FRAME_COUNT))
 
-                blob.upload_from_filename(f"temp/{filename.rsplit('.', 1)[0]}.png")
+                skip_frames = round(frame_count / 2)
+
+                cap.set(CAP_PROP_POS_FRAMES, skip_frames)
+                _, frame = cap.read()
+
+                imwrite(f"{fname}.png", frame)
+
+                cap.release()
+
+
+                blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/thumbnails/{''.join(filename.split(".")[:-1])}.png")
+
+                blob.upload_from_filename(f"{fname}.png")
 
                 blob.make_public()
 
                 thumbnail = blob.public_url
+                
+                remove(f"{fname}.{extension}")
+                remove(f"{fname}.png")
 
             elif extension in ["png", "jpg", "jpeg", "gif"]:
                 thumbnail = url
@@ -173,10 +186,14 @@ def delete(uid):
         
         for fileId in files:
             file = db.reference(f"memories/{uid}/files/{fileId}").get()
-            print(file)
 
-            blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/{file['filename']}")
-            blob.delete()    
+            filename = file['filename']
+
+            bucket = storage.bucket("kikapees.appspot.com")
+
+            bucket.blob(f"memories/{memory['title']}/files/{filename}").delete()
+
+            bucket.blob(f"memories/{memory['title']}/thumbnails/{''.join(filename.split('.')[:-1])}.png").delete()
 
             db.reference(f"memories/{uid}/files").update({fileId: None})
 
@@ -228,8 +245,13 @@ def delete_file(uid, fileId):
     if not file:
         return redirect("/404")
     
-    blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/files/{file['filename']}")
-    blob.delete()
+    filename = file["filename"]
+    
+    bucket = storage.bucket("kikapees.appspot.com")
+
+    bucket.blob(f"memories/{memory['title']}/files/{filename}").delete()
+
+    bucket.blob(f"memories/{memory['title']}/thumbnails/{''.join(filename.split('.')[:-1])}.png").delete()
 
     db.reference(f"memories/{uid}/files").update({fileId: None})
     
