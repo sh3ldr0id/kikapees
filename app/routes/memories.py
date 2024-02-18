@@ -57,7 +57,7 @@ def create():
         description = request.form["description"]
         date = request.form["date"]
 
-        url = "https://img.freepik.com/free-vector/hand-drawn-magical-dreams-background_23-2149672473.jpg?w=740&t=st=1707043517~exp=1707044117~hmac=df44bdc206d7b245b2886041247a1a015b2602fe971638de5987a5274310a364"
+        url = "https://storage.googleapis.com/kikapees.appspot.com/memories/default_memory_thumbnail.svg"
 
         if thumbnail:
             extension = thumbnail.filename.rsplit('.', 1)[1]
@@ -119,7 +119,7 @@ def upload(uid):
 
             url = blob.public_url
 
-            thumbnail = "https://storage.googleapis.com/kikapees.appspot.com/default_thumbnail.svg"
+            thumbnail = "https://storage.googleapis.com/kikapees.appspot.com/memories/default_file_thumbnail.svg"
 
             if extension in ['mp4', 'avi', 'mkv', 'mov']:
                 file.save(f"temp/{filename}")
@@ -249,9 +249,15 @@ def open(uid, fileId):
     if not memory:
         return redirect("/404")
     
+    if uid == fileId:
+        return f"<img src='{memory['thumbnail']}'>"
+    
     file = db.reference(f"memories/{uid}/files/{fileId}").get()
 
     if not file:
         return redirect("/404")
     
-    return f"<img src='{file['url']}'>"
+    if file["filename"].split("/")[-1] in ["png", "jpg", "jpeg", "gif"]:
+        return f"<img src='{file['url']}'>"
+    
+    return redirect(file["url"])

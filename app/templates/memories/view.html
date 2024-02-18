@@ -2,12 +2,12 @@
 
 {% block head %}
 <title>View - {{ memory.title }}</title>
-<link rel="icon" href="{{ memory.pfp }}" type="image/x-icon">
+<link rel="icon" href="{{ memory.thumbnail }}" type="image/x-icon">
 {% endblock %}
 
 {% block body %}
 <nav class="navbar navbar-expand-lg bg-body-tertiary" style="width: 100%;">
-    <div class="container-fluid" >
+    <div class="container-fluid">
         <a class="navbar-brand" href="#">KiKaPeeS</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
             aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,22 @@
 <hr style="color: black;">
 
 <div class="g-container">
+    <div class="card m-2 shadow" style="width: 18rem;">
+        <div class="dropdown">
+            <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="position: absolute;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue" class="bi bi-three-dots m-2"
+                    viewBox="0 0 16 16" style="rotate: 90deg;">
+                    <path
+                        d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                </svg>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/memories/view/{{ uid }}/open/{{ uid }}">Open</a></li>
+                <li><a class="dropdown-item" href="{{ memory.thumbnail }}">Download</a></li>
+            </ul>
+            <img src="{{ memory.thumbnail }}" height="200px" class="card-img object-fit-cover overflow-hidden">
+        </div>
+    </div>
 
     {% for file in files %}
     <div class="card m-2 shadow" style="width: 18rem;">
@@ -57,8 +73,8 @@
             </div>
             <div class="dropdown">
                 <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue" class="bi bi-three-dots"
-                        viewBox="0 0 16 16" style="rotate: 90deg;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue"
+                        class="bi bi-three-dots" viewBox="0 0 16 16" style="rotate: 90deg;">
                         <path
                             d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
                     </svg>
@@ -66,14 +82,16 @@
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="/memories/view/{{ uid }}/open/{{ file.uid }}">Open</a></li>
                     <li><a class="dropdown-item" href="{{ file.url }}">Download</a></li>
-                    <li><a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ file.uid }}">Delete</a></li>
+                    <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal{{ file.uid }}">Delete</a></li>
                 </ul>
             </div>
         </div>
         <img src="{{ file.thumbnail }}" height="200px" class="card-img-bottom object-fit-cover overflow-hidden c">
     </div>
 
-    <div class="modal fade" id="deleteModal{{ file.uid }}" tabindex="-1" aria-labelledby="deleteModal{{ file.uid }}Label" aria-hidden="true">
+    <div class="modal fade" id="deleteModal{{ file.uid }}" tabindex="-1"
+        aria-labelledby="deleteModal{{ file.uid }}Label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
