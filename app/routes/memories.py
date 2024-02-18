@@ -142,7 +142,7 @@ def upload(uid):
                 cap.release()
 
 
-                blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/thumbnails/{''.join(filename.split(".")[:-1])}.png")
+                blob = storage.bucket("kikapees.appspot.com").blob(f"memories/{memory['title']}/thumbnails/{''.join(filename.split('.')[:-1])}.png")
 
                 blob.upload_from_filename(f"{fname}.png")
 
