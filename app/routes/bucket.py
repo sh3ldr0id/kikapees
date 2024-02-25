@@ -69,48 +69,47 @@ def create():
         description = request.form["description"]
 
         link = request.form["reel"]
-        file = request.files["file"]
+        file = request.files.get("file")
 
         bucket = db.reference("bucket")
 
         if link:
-            try:
-                filename = f"temp/{str(uuid4())}"
+            filename = f"temp/{str(uuid4())}"
 
-                if "https://www.instagram.com/" in link:
-                    with open(f"{filename}.mp4", 'wb') as file:
-                        file.write(
+            if "https://www.instagram.com/" in link:
+                with open(f"{filename}.mp4", 'wb') as file:
+                    file.write(
+                        get(
                             get(
-                                get(
-                                    f"https://instagram-videos.vercel.app/api/video?url={link}"
-                                ).json()["data"]["videoUrl"]
-                            ).content
-                        )
+                                f"https://instagram-videos.vercel.app/api/video?url={link}"
+                            ).json()["data"]["videoUrl"]
+                        ).content
+                    )
 
-                storage_bucket = storage.bucket("kikapees.appspot.com")
+            storage_bucket = storage.bucket("kikapees.appspot.com")
 
-                blob = storage_bucket.blob(f"bucket/files")
-                blob.upload_from_filename(f"{filename}.mp4")
-                blob.make_public()
-                url = blob.public_url
+            blob = storage_bucket.blob(f"bucket/files")
+            blob.upload_from_filename(f"{filename}.mp4")
+            blob.make_public()
+            url = blob.public_url
 
-                cap = VideoCapture(filename)
-                skip_frames = round(int(cap.get(CAP_PROP_FRAME_COUNT)) / 2)
-                cap.set(CAP_PROP_POS_FRAMES, skip_frames)
-                _, frame = cap.read()
-                imwrite(f"{filename}.png", frame)
-                cap.release()
+            cap = VideoCapture(filename)
+            skip_frames = round(int(cap.get(CAP_PROP_FRAME_COUNT)) / 2)
+            cap.set(CAP_PROP_POS_FRAMES, skip_frames)
+            _, frame = cap.read()
+            print(frame)
+            imwrite(f"{filename}.png", frame)
+            cap.release()
 
-                blob = storage_bucket.blob(f"bucket/thumbnails")
-                blob.upload_from_filename(f"{filename}.png")
-                blob.make_public()
-                thumbnail = blob.public_url
+            print("im heree")
 
-                remove(f"{filename}.mp4")
-                remove(f"{filename}.png")
-            
-            except:
-                return "Invalid Reel Link"
+            blob = storage_bucket.blob(f"bucket/thumbnails")
+            blob.upload_from_filename(f"{filename}.png")
+            blob.make_public()
+            thumbnail = blob.public_url
+
+            remove(f"{filename}.mp4")
+            remove(f"{filename}.png")
 
         bucket.push({
             "title": title,

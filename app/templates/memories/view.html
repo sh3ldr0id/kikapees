@@ -62,8 +62,14 @@
                     </svg>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/memories/view/{{ uid }}/open/{{ uid }}">Open</a></li>
-                    <li><a class="dropdown-item" href="{{ memory.thumbnail }}">Download</a></li>
+                    <li class="d-flex align-items-center">
+                        <a class="dropdown-item" href="/memories/view/{{ uid }}/open/{{ uid }}">Open</a> 
+                        <img src="/static/icons/open.png" alt="" height="15px" width="15px" class="me-3">
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <a class="dropdown-item" href="{{ memory.thumbnail }}">Download</a> 
+                        <img src="/static/icons/download.png" alt="" height="15px" width="15px" class="me-3">
+                    </li>
                 </ul>
             </div>
         </div>
@@ -86,10 +92,22 @@
                     </svg>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/memories/view/{{ uid }}/open/{{ file.uid }}">Open</a></li>
-                    <li><a class="dropdown-item" href="{{ file.url }}">Download</a></li>
-                    <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
-                            data-bs-target="#deleteModal{{ file.uid }}">Delete</a></li>
+                    <li class="d-flex align-items-center">
+                        <a class="dropdown-item" href="/memories/view/{{ uid }}/open/{{ file.uid }}">Open</a> 
+                        <img src="/static/icons/open.png" alt="" height="15px" width="15px" class="me-3">
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <a class="dropdown-item" href="{{ file.url }}">Download</a> 
+                        <img src="/static/icons/download.png" alt="" height="15px" width="15px" class="me-3">
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <a class="dropdown-item text-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal{{ file.uid }}">Delete</a>
+                        <img src="/static/icons/delete.png" alt="" height="15px" width="15px" class="me-3">
+                    </li>
                 </ul>
             </div>
         </div>

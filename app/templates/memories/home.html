@@ -54,10 +54,11 @@
                         </svg>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/memories/view/{{ item.uid }}">Open</a></li>
-                        <li><a class="dropdown-item" href="/memories/upload/{{ item.uid }}">Upload</a></li>
-                        <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
-                                data-bs-target="#deleteModal{{ item.uid }}">Delete</a></li>
+                        <li class="d-flex align-items-center"><a class="dropdown-item flex-fill" href="/memories/view/{{ item.uid }}">Open</a> <img src="/static/icons/open.png" alt="" height="15px" width="15px" class="me-3"></li>
+                        <li class="d-flex align-items-center"><a class="dropdown-item flex-fill" href="/memories/upload/{{ item.uid }}">Upload</a> <img src="/static/icons/upload.png" alt="" height="15px" width="15px" class="me-3"></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="d-flex align-items-center"><a class="dropdown-item flex-fill text-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal{{ item.uid }}">Delete</a> <img src="/static/icons/delete.png" alt="" height="15px" width="15px" class="me-3"></li>
                     </ul>
                 </div>
             </div>
