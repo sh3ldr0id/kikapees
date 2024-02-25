@@ -53,22 +53,63 @@
 
 <div class="d-flex justify-content-center align-items-center flex-column border rounded shadow my-4 cont">
     <h2 class="my-3">Add a Fish</h2>
-    <form action="#" method="post" class="d-flex justify-content-center flex-column" style="width: 75%;">
-
+    <form action="#" method="post" class="d-flex justify-content-center flex-column" style="width: 75%;" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="titleInput" class="form-label">Title</label>
-            <input name="title" type="text" class="form-control" id="titleInput" placeholder="Name the fish">
+            <input name="title" type="text" class="form-control" id="titleInput" placeholder="Name the fish" required>
         </div>
         <div class="mb-3">
             <label for="descriptionInput" class="form-label">Description</label>
             <textarea name="description" class="form-control" id="descriptionInput" rows="3"
-            placeholder="Feed the fish"></textarea>
+            placeholder="Feed the fish" required></textarea>
         </div>
         <div class="mb-3">
-            <label for="reelInput" class="form-label">Reel Url</label>
+            <label for="reelInput" class="form-label">Link To Instructions</label>
             <input name="reel" type="url" class="form-control" id="reelInput" placeholder="https://instagram.com/p/xxxx">
         </div>
-        <button class="shadow-sm rounded btn btn-success  mt-3 mb-4" type="submit">Submit</button>
+        <div class="mb-3">
+            <label for="fileInput" class="form-label">Files Containing Instructions</label>
+            <input class="form-control" type="file" id="fileInput" name="file">
+        </div>
+        <button class="shadow-sm rounded btn btn-success  mt-3 mb-4" type="submit" disabled>Submit</button>
     </form>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var titleInput = document.getElementById('titleInput');
+        var descriptionInput = document.getElementById('descriptionInput');
+        var reelInput = document.getElementById('reelInput');
+        var fileInput = document.getElementById('fileInput');
+        var submitButton = document.querySelector('button[type="submit"]');
+
+        reelInput.addEventListener('input', function () {
+            if (reelInput.value.trim() !== '') {
+                fileInput.disabled = true;
+            } else {
+                fileInput.disabled = false;
+            }
+
+            var isReelEmpty = reelInput.value.trim() === '';
+            var isFileEmpty = fileInput.value.trim() === '';
+
+            submitButton.disabled = (isReelEmpty && isFileEmpty) || !reelInput.value.startsWith("https://www.instagram.com/");
+        });
+
+        fileInput.addEventListener('input', function () {
+            if (fileInput.value.trim() !== '') {
+                reelInput.disabled = true;
+            } else {
+                reelInput.disabled = false;
+            }
+
+            var isReelEmpty = reelInput.value.trim() === '';
+            var isFileEmpty = fileInput.value.trim() === '';
+
+            submitButton.disabled = (isReelEmpty && isFileEmpty) || !reelInput.value.startsWith("https://www.instagram.com/");
+        });
+
+        titleInput.addEventListener('input', checkInputs);
+        descriptionInput.addEventListener('input', checkInputs);
+    });
+</script>
 {% endblock %}

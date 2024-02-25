@@ -67,27 +67,30 @@ def create():
     elif request.method == "POST":
         title = request.form["title"]
         description = request.form["description"]
-        reel = request.form["reel"]
+
+        link = request.form["reel"]
+        file = request.files["file"]
 
         bucket = db.reference("bucket")
 
-        if reel:
+        if link:
             try:
-                link = get(
-                    f"https://instagram-videos.vercel.app/api/video?url={reel}"
-                ).json()["data"]["videoUrl"]
+                filename = f"temp/{str(uuid4())}"
 
-                filename = f"temp/{str(uuid4())}.mp4"
-
-                with open(filename, 'wb') as file:
-                    file.write(
-                        get(link).content
-                    )
+                if "https://www.instagram.com/" in link:
+                    with open(f"{filename}.mp4", 'wb') as file:
+                        file.write(
+                            get(
+                                get(
+                                    f"https://instagram-videos.vercel.app/api/video?url={link}"
+                                ).json()["data"]["videoUrl"]
+                            ).content
+                        )
 
                 storage_bucket = storage.bucket("kikapees.appspot.com")
 
                 blob = storage_bucket.blob(f"bucket/files")
-                blob.upload_from_filename(filename)
+                blob.upload_from_filename(f"{filename}.mp4")
                 blob.make_public()
                 url = blob.public_url
 
@@ -95,24 +98,16 @@ def create():
                 skip_frames = round(int(cap.get(CAP_PROP_FRAME_COUNT)) / 2)
                 cap.set(CAP_PROP_POS_FRAMES, skip_frames)
                 _, frame = cap.read()
-                imwrite(f"{filename.split('.')[0]}.png", frame)
+                imwrite(f"{filename}.png", frame)
                 cap.release()
 
                 blob = storage_bucket.blob(f"bucket/thumbnails")
-                blob.upload_from_filename(f"{filename.split('.')[0]}.png")
+                blob.upload_from_filename(f"{filename}.png")
                 blob.make_public()
                 thumbnail = blob.public_url
 
-                remove(filename)
-                remove(f"{filename.split('.')[0]}.png")
-
-                bucket.push({
-                    "thumbnail": thumbnail,
-                    "url": url,
-                    "type": "reel",
-                    "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
-                    "by": authorized
-                })
+                remove(f"{filename}.mp4")
+                remove(f"{filename}.png")
             
             except:
                 return "Invalid Reel Link"
@@ -121,6 +116,8 @@ def create():
             "title": title,
             "description": description,
             "type": "text",
+            "thumbnail": thumbnail,
+            "url": url,
             "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
             "by": authorized
         })
