@@ -6,7 +6,7 @@
 
 {% block body %}
 <nav class="navbar navbar-expand-lg bg-body-tertiary" style="width: 100%;">
-    <div class="container-fluid" >
+    <div class="container-fluid">
         <a class="navbar-brand" href="#">KiKaPeeS</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
             aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,8 @@
 <div class="g-container">
     {% for item in memories %}
     <div class="card m-3 shadow" style="width: 18rem;">
-        <img src="{{ item.thumbnail }}" height="200px" class="card-img-top object-fit-cover overflow-hidden border-bottom">
+        <img src="{{ item.thumbnail }}" height="200px"
+            class="card-img-top object-fit-cover overflow-hidden border-bottom">
         <div class="card-body">
             <div class="d-flex">
                 <div class="flex-fill">
@@ -54,11 +55,27 @@
                         </svg>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="d-flex align-items-center"><a class="dropdown-item flex-fill" href="/memories/view/{{ item.uid }}">Open</a> <img src="/static/icons/open.png" alt="" height="15px" width="15px" class="me-3"></li>
-                        <li class="d-flex align-items-center"><a class="dropdown-item flex-fill" href="/memories/upload/{{ item.uid }}">Upload</a> <img src="/static/icons/upload.png" alt="" height="15px" width="15px" class="me-3"></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li class="d-flex align-items-center"><a class="dropdown-item flex-fill text-danger" data-bs-toggle="modal"
-                                data-bs-target="#deleteModal{{ item.uid }}">Delete</a> <img src="/static/icons/delete.png" alt="" height="15px" width="15px" class="me-3"></li>
+                        <li>
+                            <a class="d-flex align-items-center dropdown-item" href="/memories/view/{{ item.uid }}">
+                                <div class="d-flex align-items-center flex-fill fw-normal">Open</div>
+                                <img src="/static/icons/open.png" alt="" height="15px" width="15px">
+                            </a>
+                        </li>
+                        <li>
+                            <a class="d-flex align-items-center dropdown-item" href="/memories/upload/{{ item.uid }}">
+                                <div class="d-flex align-items-center flex-fill">Upload</div>
+                                <img src="/static/icons/upload.png" alt="" height="15px" width="15px">
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="d-flex align-items-center dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal{{ item.uid }}">
+                                <div class="d-flex align-items-center flex-fill text-danger">Delete</div>
+                                <img src="/static/icons/delete.png" alt="" height="15px" width="15px">
+                            </a> 
+                        </li>
                     </ul>
                 </div>
             </div>
