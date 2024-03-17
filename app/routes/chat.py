@@ -2,10 +2,14 @@ from flask import Blueprint, request, redirect, render_template, session
 from firebase_admin import db
 from datetime import datetime
 
+from app.helpers.firebase_apps import FirebaseApps
+
 blueprint = Blueprint(
     'chat', 
     __name__
 )
+
+firebase_app = FirebaseApps().chat()
 
 def other(user):
     if user == "kunji":

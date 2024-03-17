@@ -4,3 +4,4 @@ config/*.json
 tests/*
 temp/
 test.py
+Firebase Credentials/
