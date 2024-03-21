@@ -51,10 +51,10 @@ def create_app(host="127.0.0.1", port=5000):
             continue
 
         if "dffs" in blob.name:
-            blob.download_to_filename(f"Firebase Credentials/DFFS/{blob.name.split("/")[-1]}")
+            blob.download_to_filename(f"Firebase Credentials/DFFS/{blob.name.split('/')[-1]}")
         
         else:
-            blob.download_to_filename(f"Firebase Credentials/{blob.name.split("/")[-1]}")
+            blob.download_to_filename(f"Firebase Credentials/{blob.name.split('/')[-1]}")
 
     firebase_app.load_nodes()
 
