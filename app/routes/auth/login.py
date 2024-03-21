@@ -1,5 +1,7 @@
-from app.routes.auth import blueprint, db
+from app.routes.auth import blueprint
 from flask import session, render_template, redirect, request
+
+from firebase_admin import db
 
 from app.helpers.validate_token import validate
 from app.helpers.get_location import get_location
@@ -25,8 +27,6 @@ def login():
         password = request.form["password"]
 
         password_hash = db.reference(f"users/{user}/password").get()
-
-        print(password_hash, hash_password(password))
 
         if hash_password(password) == password_hash:
             token = str(uuid4())

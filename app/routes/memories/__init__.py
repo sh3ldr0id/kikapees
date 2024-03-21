@@ -1,16 +1,25 @@
 from flask import Blueprint
-from app.helpers.firebase_apps import FirebaseApps
+from firebase_admin import db, storage
 
+blueprint = None
+reference = None
+bucket = None
+nodes = None
 
-blueprint = Blueprint(
-    'memories', 
-    __name__
-)
+class Memories:
+    def __init__(self, fb_app):
+        global blueprint, reference, bucket, nodes
 
-firebase_app, nodes = FirebaseApps().memories()
+        self.blueprint = Blueprint(
+            'memories', 
+            __name__
+        )
 
-from firebase_admin import storage
+        blueprint = self.blueprint
 
-bucket = storage.bucket(app=firebase_app)
+        firebase_app, nodes = fb_app.memories()
 
-from . import home, create, view, delete, upload, view_file, delete_file
+        reference = db.reference(app=firebase_app)
+        bucket = storage.bucket(app=firebase_app)
+
+        from . import home, create, view, delete, upload, view_file, delete_file

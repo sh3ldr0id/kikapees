@@ -1,5 +1,7 @@
-from app.routes.bucket import blueprint, db
+from app.routes.bucket import blueprint, firebase_app
 from flask import session, render_template, redirect
+
+from firebase_admin import db
 
 from app.helpers.validate_token import validate
 
@@ -12,7 +14,7 @@ def home():
     if not authorized:
         return redirect("/")
     
-    data = db.reference("/").get()
+    data = db.reference(app=firebase_app).get()
 
     bucket = []
 

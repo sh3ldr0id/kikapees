@@ -4,17 +4,17 @@ blueprint = None
 firebase_app = None
 nodes = None
 
-class Bucket:
+class Chat:
     def __init__(self, fb_app):
         global blueprint, firebase_app, nodes
 
         self.blueprint = Blueprint(
-            'bucket', 
+            'chat', 
             __name__
         )
 
         blueprint = self.blueprint
 
-        firebase_app, nodes = fb_app.bucket()
+        firebase_app, nodes = fb_app.chat()
 
         from . import home, create, view, delete

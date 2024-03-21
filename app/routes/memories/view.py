@@ -1,7 +1,5 @@
-from app.routes.memories import blueprint, firebase_app
+from app.routes.memories import blueprint, reference
 from flask import session, render_template, redirect
-
-from firebase_admin import db
 
 from app.helpers.validate_token import validate
 
@@ -14,10 +12,7 @@ def view(uid):
     if not authorized:
         return redirect("/")
     
-    memory = db.reference(
-        app=firebase_app,
-        path=uid
-    ).get()
+    memory = reference.child(uid).get()
 
     if not memory:
         return redirect("/404")

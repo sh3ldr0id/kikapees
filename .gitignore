@@ -1,7 +1,8 @@
 venv
 config/*.json
-**/__pycache__
+**/__pycache__/
 tests/*
 temp/
 test.py
 Firebase Credentials/
+firebase.json

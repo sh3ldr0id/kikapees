@@ -4,13 +4,12 @@ from firebase_admin.credentials import Certificate
 from os import listdir
 
 def load_app(name):
-    cred = Certificate(f"Firebase Credentials/memories/{name}.json")
+    cred = Certificate(f"Firebase Credentials/DFFS/{name}.json")
 
     app = initialize_app(
         credential=cred, 
         options={
-        'databaseURL': f'https://kikapees-memories-{name}-default-rtdb.asia-southeast1.firebasedatabase.app/',
-        "storageBucket": f"kikapees-memories-{name}.appspot.com"
+            "storageBucket": f"kikapees-dffs-{name}.appspot.com"
         },
         name=name
     )
@@ -18,7 +17,7 @@ def load_app(name):
     return app
 
 def get_available():
-    files = listdir("Firebase Credentials/memories/")
+    files = listdir("Firebase Credentials/DFFS/")
 
     available = [file.split(".")[0] for file in files]
 

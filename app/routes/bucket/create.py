@@ -1,5 +1,7 @@
-from app.routes.bucket import blueprint, db, storage
+from app.routes.bucket import blueprint
 from flask import session, render_template, redirect, request
+
+from firebase_admin import db, storage
 
 from app.helpers.generate_thumbnail import generate_thumbnail
 from app.helpers.validate_token import validate

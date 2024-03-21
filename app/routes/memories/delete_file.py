@@ -1,7 +1,7 @@
-from app.routes.memories import blueprint, firebase_app, nodes
+from app.routes.memories import blueprint, reference, bucket, nodes
 from flask import session, redirect
 
-from firebase_admin import db, storage
+from firebase_admin import storage
 
 from app.helpers.validate_token import validate
 
@@ -14,34 +14,26 @@ def delete_file(uid, fileId):
     if not authorized:
         return redirect("/")
     
-    memory = db.reference(
-        app=firebase_app,
-        path=uid
-    ).get()
+    memory = reference.child(uid).get()
 
     if not memory:
         return redirect("/404")
     
-    file = db.reference(
-        app=firebase_app,
-        path=f"{uid}/files/{fileId}"
-    ).get()
+    file = reference.child(f"{uid}/files/{fileId}").get()
 
     if not file:
         return redirect("/404")
     
     filename = file["filename"]
+    thumbnail_filename = file["thumbnail_filename"]
     node = file["node"]
 
     node_app = nodes[node]
     
     bucket = storage.bucket(app=node_app)
-    bucket.blob(f"{memory['title']}/files/{filename}").delete()
-    bucket.blob(f"{memory['title']}/thumbnails/{filename.split('.')[:-1]}.png").delete()
+    bucket.blob(f"memories/{memory['title']}/files/{filename}").delete()
+    bucket.blob(f"memories/{memory['title']}/thumbnails/{thumbnail_filename}").delete()
 
-    db.reference(
-        app=firebase_app,
-        path=f"{uid}/files"
-    ).update({fileId: None})
+    reference.child(f"{uid}/files").update({fileId: None})
     
     return redirect(f"/memories/view/{uid}")

@@ -12,11 +12,7 @@
 {% block body %}
 <form action="#" method="post" class="d-flex justify-content-center align-items-center flex-column shadow p-4 rounded">
     <h1>Login</h1>
-    <input type="radio" class="btn-check" name="user" id="option1" value="kunji" autocomplete="off" checked>
-    <label class="btn btn-outline-primary mt-2 mb-2 px-5" for="option1">Kunji</label>
-    <input type="radio" class="btn-check" name="user" id="option2" value="kunja" autocomplete="off">
-    <label class="btn btn-outline-primary mb-2 px-5" for="option2">Kunja</label>
-
+    <input class="shadow-sm border p-2 mt-2 mb-1 bg-body-tertiary rounded" name="user" type="text" placeholder="Username">
     <input class="shadow-sm border p-2 mt-2 mb-3 bg-body-tertiary rounded" name="password" type="password" placeholder="Password">
 
     <button class="shadow-sm rounded btn btn-success px-5">Submit</button>

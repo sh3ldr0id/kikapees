@@ -1,13 +1,16 @@
 from flask import Blueprint
-from ...helpers.firebase_apps import FirebaseApps
 
-from firebase_admin import db
+blueprint = None
 
-blueprint = Blueprint(
-    'auth', 
-    __name__
-)
+class Auth:
+    def __init__(self):
+        global blueprint
 
-firebase_app = FirebaseApps().auth()
+        self.blueprint = Blueprint(
+            'auth', 
+            __name__
+        )
 
-from . import login, logout, deactivate, delete, sessions
+        blueprint = self.blueprint
+
+        from . import login, logout, deactivate, delete, sessions
