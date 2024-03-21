@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Chat - {{ other }}</title>
+<style>
+    body {
+        height: 100vh;
+    }
+
+    .cont {
+        height: 90%;
+        width: 100%;
+    }
+
+    .msg {
+        color: white;
+    }
+
+    .user {
+        background-color: #198754;
+    }
+
+    .other {
+        background-color: #0d6efd;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary" style="width: 100%;">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">KiKaPeeS</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse " id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="/bucket">Bucket</a>
+                <a class="nav-link" href="/memories">Memories</a>
+                <a class="nav-link" href="/diary">Diary</a>
+                <a class="nav-link active" aria-current="page" href="#">Chat</a>
+                <a class="nav-link" href="/auth/sessions">Sessions</a>
+                <a class="nav-link text-danger" href="/auth/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="d-flex flex-column rounded shadow border cont">
+    <div class="chats pt-2" id="chats" style="height: 100%; overflow-y: auto;"></div>
+    <div class="d-flex align-items-center border-top shadow-top" style="width: 100%;">
+        <input class="shadow-sm border m-2 p-2 bg-body-tertiary rounded" type="text" id="messageInput"
+            style="width: 100%;">
+        <input type="submit" id="sendButton"
+            class="btn btn-success my-2 me-2 p-2 rounded border d-flex justify-content-center align-items-center"
+            value="Send">
+    </div>
+</div>
+
+<script>
+    const chats = document.getElementById("chats");
+    const messageInput = document.getElementById("messageInput");
+
+    var startTimestamp = Math.floor(new Date().getTime() / 1000);
+    var populated = false;
+
+    function generateMessageElement(message) {
+        const outerDiv = document.createElement("div");
+        outerDiv.classList.add("d-flex");
+        outerDiv.id = message.uid;
+        outerDiv.style.width = "100%";
+
+        const dropdownDiv = document.createElement("div");
+        
+        const contentDiv = document.createElement("div");
+        contentDiv.setAttribute("data-bs-toggle", "dropdown");
+        contentDiv.setAttribute("aria-expanded", "false");
+        contentDiv.classList.add("rounded", "msg");
+
+        const contentParagraph = document.createElement("p");
+        contentParagraph.classList.add("p-2");
+        contentParagraph.style.whiteSpace = "pre-wrap";
+        contentParagraph.textContent = message.content;
+
+        contentDiv.appendChild(contentParagraph);
+
+        const dropdownMenu = document.createElement("ul");
+        dropdownMenu.classList.add("dropdown-menu");
+
+        const replyItem = createDropdownItem("Reply", () => reply(message.uid));
+        const copyItem = createDropdownItem("Copy", () => copyMessage(message.content));
+
+        dropdownMenu.appendChild(replyItem);
+        dropdownMenu.appendChild(copyItem);
+
+        dropdownDiv.appendChild(contentDiv);
+        dropdownDiv.appendChild(dropdownMenu);
+
+        outerDiv.appendChild(dropdownDiv);
+
+        function createDropdownItem(text, onClick) {
+            const item = document.createElement("li");
+            const link = document.createElement("a");
+            link.classList.add("dropdown-item");
+            if (text == "Delete") link.classList.add("text-danger");
+            link.textContent = text;
+            link.addEventListener("click", onClick);
+            item.appendChild(link);
+            return item;
+        }
+
+        if (message.by == "{{ user }}") {
+            outerDiv.classList.add("justify-content-end");
+            dropdownDiv.classList.add("dropdown", "me-2", "ms-3");
+            contentDiv.classList.add("user")
+
+            const deleteItem = createDropdownItem("Delete", () => deleteMessage(message.uid));
+            dropdownMenu.appendChild(deleteItem);
+
+        } else {
+            outerDiv.classList.add("justify-content-start")
+            dropdownDiv.classList.add("dropdown", "ms-2", "me-3");
+            contentDiv.classList.add("other")
+        }
+
+        return outerDiv;
+    }
+
+    function copyMessage(content) {
+        navigator.clipboard.writeText(content)
+            .then(() => {
+                console.log('Text copied to clipboard');
+            })
+            .catch(err => {
+                console.error('Unable to copy text to clipboard', err);
+            });
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function getMessages(s) {
+        var request = await fetch(`/chat/get/${startTimestamp}`)
+
+        var data = await request.json()
+
+        data = data.messages
+
+        if (startTimestamp > data[0].timestamp) {
+            startTimestamp = data[0].timestamp
+
+            data = data.reverse();
+
+            data.forEach(message => {
+                chats.insertBefore(generateMessageElement(message), chats.firstChild);
+            })
+        }
+
+        if (chats.scrollHeight <= chats.clientHeight) {
+            getMessages(true)
+        } else {
+            if (s) chats.scrollTop = chats.scrollHeight;
+        }
+    }
+
+    getMessages();
+
+    chats.addEventListener("scroll", () => {
+        if (chats.scrollTop == 0) {
+
+            getMessages()
+
+            chats.scrollTop = 10;
+        }
+    })
+
+    function sendMessage() {
+        if (messageInput.value == "") return
+
+        const message = {
+            "token": "{{ token }}",
+            "content": messageInput.value,
+            "by": "{{ user }}",
+            "timestamp": Math.floor(new Date().getTime() / 1000)
+        }
+
+        fetch('/chat/message', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(message)
+        })
+            .then(response => response.json())
+            .then(data => {
+                message.uid = data.uid
+                chats.appendChild(generateMessageElement(message));
+                chats.scrollTop = chats.scrollHeight;
+            });
+
+        messageInput.value = "";
+    }
+
+    function deleteMessage(uid) {
+        console.log(uid)
+        fetch('/chat/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ "uid": uid })
+        })
+            .then(response => response.json())
+            .then(data => {
+                element = document.getElementById(uid)
+                chats.removeChild(element)
+            });
+    }
+
+    function getUpdates() {
+        fetch(`/chat/polling`)
+            .then(response => response.json())
+            .then(async data => {
+                    if (data.action == "new") {
+                        const message = data.message
+
+                        chats.appendChild(generateMessageElement(message));
+                        chats.scrollTop = chats.scrollHeight;
+
+                    } else if (data.action == "delete") {
+                        const uid = data.uid;
+
+                        element = document.getElementById(uid);
+                        chats.removeChild(element)
+
+                        console.log("deleted shit")
+
+                    } else {
+                        await sleep(500);
+                    }
+
+                getUpdates();
+            });
+    }
+
+    document.getElementById("sendButton").addEventListener("click", sendMessage)
+
+    document.getElementById("messageInput").addEventListener("keypress", (event) => {
+        if (event.key == "Enter") sendMessage();
+    })
+
+    getUpdates();
+</script>
+{% endblock %}

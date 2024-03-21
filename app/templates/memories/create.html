@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Create a To Do</title>
+{% endblock %}
+
+{% block body %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary" style="width: 100%;">
+    <div class="container-fluid" >
+        <a class="navbar-brand" href="#">KiKaPeeS</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse " id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="/bucket">Bucket</a>
+                <a class="nav-link active" aria-current="page" href="/memories">Memories</a>
+                <a class="nav-link" href="/chat">Chat</a>
+                <a class="nav-link" href="/auth/sessions">Sessions</a>
+                <a class="nav-link text-danger" href="/auth/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/memories">Memories</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Create</li>
+    </ol>
+</nav>
+
+<form action="#" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="titleInput" class="form-label">Title</label>
+        <input type="text" name="title" class="form-control" id="titleInput" placeholder="Title">
+    </div>
+    <div class="mb-3">
+        <label for="descriptionInput" class="form-label">Description</label>
+        <textarea class="form-control" id="descriptioInput" rows="3" placeholder="Description" name="description"></textarea>
+    </div>
+    <div class="mb-3">
+        <label for="dateInput" class="form-label">Date</label>
+        <input class="form-control" type="date" id="dateInput" name="date">
+    </div>
+    <div class="mb-3">
+        <label for="fileInput" class="form-label">Thumbnail</label>
+        <input class="form-control" type="file" id="fileInput" accept=".png, .jpg, .jpeg, .gif" name="thumbnail">
+    </div>
+    <button class="shadow-sm rounded btn btn-success px-5" type="submit" style="width: 100%;">Submit</button>
+</form>
+{% endblock %}

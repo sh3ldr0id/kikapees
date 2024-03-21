@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary" style="width: 100%;">
+    <div class="container-fluid" >
+        <a class="navbar-brand" href="#">KiKaPeeS</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse " id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="/bucket">Bucket</a>
+                <a class="nav-link" href="/memories">Memories</a>
+                <a class="nav-link" href="/diary">Diary</a>
+                <a class="nav-link active" aria-current="page" href="#">Sessions</a>
+                <a class="nav-link" href="/chat">Chat</a>
+                <a class="nav-link text-danger" href="/auth/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="g-container my-4">
+    {% for session in sessions %}
+    <div class="card m-2 shadow" style="width: 18rem;">
+        <div class="card-body">
+            <div class="d-flex">
+                <div class="flex-fill">
+                    <h5 class="card-title">{{ session.time }}</h5>
+                    {% if session.active == "Active" %}
+                    <h6 class="card-subtitle mb-2 text-success">{{ session.active }}</h6>
+                    {% endif %}
+                    {% if session.active == "Inactive" %}
+                    <h6 class="card-subtitle mb-2 text-danger">{{ session.active }}</h6>
+                    {% endif %}
+                </div>
+                <div class="dropdown m-2">
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="navyblue"
+                            class="bi bi-three-dots" viewBox="0 0 16 16" style="rotate: 90deg;">
+                            <path
+                                d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% if session.active == "Active" %}
+                            <li><a class="dropdown-item" href="/auth/deactivate/{{ session.token }}">Deactivate</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal{{ session.token }}">Delete</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="card-text">
+                {{ session.ip }}
+                {% if "country" in session.location %}
+                    - {{ session.location.country }}
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal{{ session.token }}" tabindex="-1"
+        aria-labelledby="deleteModal{{ session.token }}Label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteModal{{ session.token }}Label">Actions have consequences...</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure that you want to delete this entry?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="/auth/delete/{{ session.token }}">
+                        <button type="button" class="btn btn-danger">Delete</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

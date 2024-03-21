@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>KiKaPeEs Login</title>
+<style>
+    body {
+        height: 100vh;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<form action="#" method="post" class="d-flex justify-content-center align-items-center flex-column shadow p-4 rounded">
+    <h1>Login</h1>
+    <input class="shadow-sm border p-2 mt-2 mb-1 bg-body-tertiary rounded" name="user" type="text" placeholder="Username">
+    <input class="shadow-sm border p-2 mt-2 mb-3 bg-body-tertiary rounded" name="password" type="password" placeholder="Password">
+
+    <button class="shadow-sm rounded btn btn-success px-5">Submit</button>
+</form>
+{% endblock %}
