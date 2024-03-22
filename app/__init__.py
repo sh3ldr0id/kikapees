@@ -21,7 +21,7 @@ def create_app(host="127.0.0.1", port=5000):
 
     @app.errorhandler(500)
     def not_found(e):
-        return "Sorryyyy!!! I fucked up somewhere..."
+        return "Sorryyyy!!! I messed up somewhere..."
 
     @app.route("/")
     def index():
